@@ -16,7 +16,7 @@ class Packer < Thor
 
   desc "validate", "validates the packer config"
   def validate
-    system "packer validate config/#{tag_name}.json"
+    system "packer validate config/amis/#{tag_name}.json"
   end
 
   desc "console", "interactive session"
