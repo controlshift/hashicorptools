@@ -112,7 +112,7 @@ class Terraform < Thor
   def settings(settings_overrides = {})
     {aws_access_key: ENV['AWS_ACCESS_KEY_ID'],
      aws_secret_key: ENV['AWS_SECRET_ACCESS_KEY'],
-     app_environment: options[:environment]}.merge!(env_variable_keys)
+     app_environment: options[:environment]}.merge!(env_variable_keys).merge(settings_overrides)
   end
 
   def terraform_version
