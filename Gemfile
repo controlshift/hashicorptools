@@ -3,6 +3,7 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
+gem 'aws-sdk-v1'
 gem 'dotenv'
 gem 'thor'
 gem 'activesupport'

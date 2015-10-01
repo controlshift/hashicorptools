@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Nathan Woodhull"]
-  s.date = "2015-05-13"
+  s.date = "2015-10-01"
   s.description = "Wrappers for terraform and packer"
   s.email = "systems@controlshiftlabs.com"
   s.extra_rdoc_files = [
@@ -20,32 +20,42 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE",
     "README.md",
     "Rakefile",
+    "VERSION",
+    "hashicorptools.gemspec",
+    "lib/ec2_utilities.rb",
     "lib/hashicorptools.rb",
+    "lib/packer.rb",
+    "lib/terraform.rb",
     "spec/hashicorptools_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/woodhull/hashicorptools"
   s.licenses = ["MIT"]
-  s.rubygems_version = "2.4.6"
+  s.rubygems_version = "2.2.2"
   s.summary = "Wrappers for terraform and packer"
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<aws-sdk-v1>, [">= 0"])
       s.add_runtime_dependency(%q<dotenv>, [">= 0"])
       s.add_runtime_dependency(%q<thor>, [">= 0"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 2.0.1"])
       s.add_development_dependency(%q<simplecov>, [">= 0"])
     else
+      s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
       s.add_dependency(%q<dotenv>, [">= 0"])
       s.add_dependency(%q<thor>, [">= 0"])
+      s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
@@ -53,8 +63,10 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<simplecov>, [">= 0"])
     end
   else
+    s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
     s.add_dependency(%q<dotenv>, [">= 0"])
     s.add_dependency(%q<thor>, [">= 0"])
+    s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.8.0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])

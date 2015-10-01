@@ -1,7 +1,16 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    activesupport (4.2.4)
+      i18n (~> 0.7)
+      json (~> 1.7, >= 1.7.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.3, >= 0.3.4)
+      tzinfo (~> 1.1)
     addressable (2.3.8)
+    aws-sdk-v1 (1.66.0)
+      json (~> 1.4)
+      nokogiri (>= 1.4.4)
     builder (3.2.2)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -21,6 +30,7 @@ GEM
       oauth2
     hashie (3.4.1)
     highline (1.7.2)
+    i18n (0.7.0)
     jeweler (2.0.1)
       builder
       bundler (>= 1.0)
@@ -33,6 +43,7 @@ GEM
     json (1.8.2)
     jwt (1.5.0)
     mini_portile (0.6.2)
+    minitest (5.8.1)
     multi_json (1.11.0)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -63,11 +74,15 @@ GEM
     simplecov-html (0.10.0)
     thor (0.19.1)
     thread_safe (0.3.5)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport
+  aws-sdk-v1
   bundler (~> 1.0)
   dotenv
   jeweler (~> 2.0.1)
