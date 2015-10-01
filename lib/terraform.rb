@@ -1,5 +1,5 @@
 class Terraform < Thor
-  TERRAFORM_VERSION = '0.5.0'
+  TERRAFORM_VERSION = '0.6.3'
 
   include Ec2Utilities
 
