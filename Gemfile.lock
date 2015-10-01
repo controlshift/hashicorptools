@@ -12,6 +12,7 @@ GEM
       json (~> 1.4)
       nokogiri (>= 1.4.4)
     builder (3.2.2)
+    byebug (6.0.2)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.1.3)
@@ -84,9 +85,13 @@ DEPENDENCIES
   activesupport
   aws-sdk-v1
   bundler (~> 1.0)
+  byebug
   dotenv
   jeweler (~> 2.0.1)
   rdoc (~> 3.12)
   rspec (~> 2.8.0)
   simplecov
   thor
+
+BUNDLED WITH
+   1.10.6
