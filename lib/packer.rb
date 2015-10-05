@@ -10,14 +10,15 @@ class Packer < Thor
         -var 'aws_secret_key=#{ENV['AWS_SECRET_ACCESS_KEY']}' \
         -var 'source_ami=#{source_ami_id}' \
         -var 'ami_tag=#{tag_name}' \
-        config/amis/#{tag_name}.json"
+        -var 'cookbook_name=#{cookbook_name}' \
+        #{ami_config_path}"
 
     clean_amis
   end
 
   desc "validate", "validates the packer config"
   def validate
-    system "packer validate config/amis/#{tag_name}.json"
+    system "packer validate #{ami_config_path}"
   end
 
   desc "console", "interactive session"
@@ -47,6 +48,14 @@ class Packer < Thor
 
   def tag_name
     raise 'implement me'
+  end
+
+  def cookbook_name
+    raise 'implement me'
+  end
+
+  def ami_config_path
+    "config/amis/#{tag_name}.json"
   end
 
   def clean_amis
