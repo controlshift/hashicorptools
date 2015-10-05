@@ -42,7 +42,7 @@ class Packer < Thor
   protected
 
   def source_ami_id
-    current_ami('agra-common-image').image_id
+    current_ami('base-image').image_id
   end
 
   def tag_name
