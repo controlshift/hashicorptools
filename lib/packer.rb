@@ -9,6 +9,7 @@ class Packer < Thor
         -var 'aws_access_key=#{ENV['AWS_ACCESS_KEY_ID']}' \
         -var 'aws_secret_key=#{ENV['AWS_SECRET_ACCESS_KEY']}' \
         -var 'source_ami=#{source_ami_id}' \
+        -var 'ami_tag=#{tag_name}' \
         config/amis/#{tag_name}.json"
 
     clean_amis
