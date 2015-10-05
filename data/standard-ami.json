@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "source_ami": "",
+    "ami_tag": "",
+    "cookbook_name": ""
+  },
+
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "us-east-1",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "{{user `ami_tag`}} {{timestamp}}",
+      "tags": {
+        "{{user `ami_tag`}}": "{{timestamp}}",
+        "created_at": "{{isotime}}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get -y install curl"
+      ]
+    },
+    {
+      "type": "chef-solo",
+      "cookbook_paths": ["cookbooks", "site-cookbooks"],
+      "run_list": ["{{user `cookbook_name`}}"],
+      "json": {"s3_credentials": {"aws_access_key": "{{user `aws_access_key`}}", "aws_secret_key": "{{user `aws_secret_key`}}"}},
+      "install_command" : "curl -LO https://www.opscode.com/chef/install.sh && sudo bash ./install.sh -v 12.3.0-1 && rm install.sh"
+    }
+  ]
+}
