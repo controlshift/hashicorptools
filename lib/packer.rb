@@ -55,7 +55,8 @@ class Packer < Thor
   end
 
   def ami_config_path
-    File.join(Gem.datadir('hashicorptools').gsub(/\/hashcorptools$/, ''), 'standard-ami.json')
+    datadir_path = Gem.datadir('hashicorptools').gsub(/\/hashicorptools$/, '')  # workaround for bug in Gem.datadir
+    File.join(datadir_path, 'standard-ami.json')
   end
 
   def clean_amis
