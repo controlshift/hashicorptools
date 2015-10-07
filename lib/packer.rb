@@ -1,19 +1,14 @@
+require 'variables'
+
 NUMBER_OF_AMIS_TO_KEEP = 2
 
 class Packer < Thor
-  include ::Ec2Utilities
+  include Ec2Utilities
+  include Variables
 
   desc "build", "creates an AMI from the current config"
   def build
-    system "packer build \
-        -var 'aws_access_key=#{ENV['AWS_ACCESS_KEY_ID']}' \
-        -var 'aws_secret_key=#{ENV['AWS_SECRET_ACCESS_KEY']}' \
-        -var 'source_ami=#{source_ami_id}' \
-        -var 'ami_tag=#{tag_name}' \
-        -var 'cookbook_name=#{cookbook_name}' \
-        #{ami_config_path}"
-
-    clean_amis
+    _build
   end
 
   desc "validate", "validates the packer config"
@@ -41,6 +36,16 @@ class Packer < Thor
   end
 
   protected
+
+  def _build(settings_overrides={})
+    settings_overrides.merge!({source_ami: source_ami_id, ami_tag: tag_name})
+
+    system "packer build \
+        #{variables(settings_overrides)} \
+        #{ami_config_path}"
+
+    clean_amis
+  end
 
   def source_ami_id
     current_ami('base-image').image_id

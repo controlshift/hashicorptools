@@ -1,7 +1,10 @@
+require 'variables'
+
 class Terraform < Thor
   TERRAFORM_VERSION = '0.6.3'
 
   include Ec2Utilities
+  include Variables
 
   desc 'bootstrap', 'terraform a new infrastructure from scratch'
   option :environment, :required => true
@@ -21,6 +24,9 @@ class Terraform < Thor
       define_method "_#{cmd}" do |asg_colors = nil, settings_overrides = {}|
         enforce_version!
         raise 'invalid environment' unless ['staging', 'production'].include?(options[:environment])
+
+        settings_overrides.merge!({app_environment: options[:environment]}.merge(env_variable_keys))
+
         send("before_#{cmd}")
         if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
           send("after_#{cmd}")
@@ -109,12 +115,6 @@ class Terraform < Thor
     `#{output_cmd(name)}`.chomp
   end
 
-  def settings(settings_overrides = {})
-    {aws_access_key: ENV['AWS_ACCESS_KEY_ID'],
-     aws_secret_key: ENV['AWS_SECRET_ACCESS_KEY'],
-     app_environment: options[:environment]}.merge!(env_variable_keys).merge(settings_overrides)
-  end
-
   def terraform_version
     version_string = `terraform version`.chomp
     version = /(\d+.\d+.\d+)/.match(version_string)
@@ -142,9 +142,5 @@ class Terraform < Thor
     return @current_tfstate if defined?(@current_tfstate)
     raw_conf = File.read(state_path)
     @current_tfstate = JSON.parse(raw_conf)
-  end
-
-  def variables(settings_overrides = {})
-    settings(settings_overrides).collect{|key,value| "-var '#{key}=#{value}'" }.join(' ')
   end
 end
