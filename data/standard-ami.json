@@ -19,7 +19,8 @@
       "ami_name": "{{user `ami_tag`}} {{timestamp}}",
       "tags": {
         "{{user `ami_tag`}}": "{{timestamp}}",
-        "created_at": "{{isotime}}"
+        "created_at": "{{isotime}}",
+        "parent_ami": "{{user `source_ami`}}"
       }
     }
   ],
