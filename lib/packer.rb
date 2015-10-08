@@ -7,6 +7,7 @@ class Packer < Thor
   include Variables
 
   desc "build", "creates an AMI from the current config"
+  option :debug, :required => false
   def build
     _build
   end
@@ -38,11 +39,18 @@ class Packer < Thor
   protected
 
   def _build(settings_overrides={})
-    settings_overrides.merge!({source_ami: source_ami_id, ami_tag: tag_name})
+    settings_overrides.merge!({source_ami: source_ami_id, ami_tag: tag_name, cookbook_name: cookbook_name})
 
-    system "packer build \
+    if options[:debug]
+      puts "[DEBUG] Executing 'packer build -debug #{variables(settings_overrides)} #{ami_config_path}'"
+      system "packer build -debug \
         #{variables(settings_overrides)} \
         #{ami_config_path}"
+    else
+      system "packer build \
+        #{variables(settings_overrides)} \
+        #{ami_config_path}"
+    end
 
     clean_amis
   end
