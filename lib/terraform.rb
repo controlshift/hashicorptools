@@ -31,6 +31,7 @@ class Terraform < Thor
         if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
           send("after_#{cmd}")
         end
+        encrypt_tfstate
       end
 
       define_method "before_#{cmd}" do
@@ -40,7 +41,7 @@ class Terraform < Thor
 
     no_commands do
       define_method "after_#{cmd}" do
-        encrypt_tfstate
+        # no-op
       end
     end
   end
