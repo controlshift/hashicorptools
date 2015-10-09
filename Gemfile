@@ -1,7 +1,7 @@
 source "http://rubygems.org"
-# Add dependencies required to use your gem here.
-# Example:
-#   gem "activesupport", ">= 2.3.5"
+
+# try to slowly migrate to v2 of the aws api
+gem 'aws-sdk', '~> 2'
 
 gem 'aws-sdk-v1'
 gem 'dotenv'

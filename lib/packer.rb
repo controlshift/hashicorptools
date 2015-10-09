@@ -1,4 +1,5 @@
 require 'variables'
+require 'aws-sdk'
 
 NUMBER_OF_AMIS_TO_KEEP = 2
 
@@ -20,7 +21,7 @@ class Packer < Thor
   desc "console", "interactive session"
   def console
     require 'pry-byebug'
-    ec2 = AWS::EC2.new
+    ec2 = Aws::EC2::Client.new(region: 'us-east-1')
     binding.pry
   end
 
@@ -31,9 +32,24 @@ class Packer < Thor
     end
   end
 
-  desc "clean", "clean old AMIs that are no longer neaded"
+  desc "clean", "clean old AMIs that are no longer needed"
   def clean
     clean_amis
+  end
+
+  desc "boot", "start up an instance of the latest version of AMI" 
+  def boot
+    ec2 = Aws::EC2::Client.new(region: 'us-east-1')
+    run_instances_resp = ec2.run_instances(image_id: current_ami('base-image').image_id,
+      min_count: 1,
+      max_count: 1,
+      instance_type: "t2.micro")
+
+    ec2.create_tags( resources: run_instances_resp.instances.collect{|i| i.instance_id },
+        tags: [ {key: 'Name', value: "packer test boot"}, {key: 'environment', value: 'packer-development'}, {key: 'temporary', value: 'kill me'}])
+
+    require 'pry-byebug'
+    binding.pry
   end
 
   protected
