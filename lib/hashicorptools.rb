@@ -1,10 +1,15 @@
 require 'bundler/setup'
 require 'dotenv'
 require 'thor'
-require 'host'
-require 'ec2_utilities'
 require 'active_support/all'
-require 'packer'
-require 'terraform'
+require 'aws-sdk-v1'
+require 'aws-sdk'
 
-Dotenv.load
+module Hashicorptools
+end
+
+require_relative 'hashicorptools/variables'
+require_relative 'hashicorptools/ec2_utilities'
+require_relative 'hashicorptools/packer'
+require_relative 'hashicorptools/terraform'
+require_relative 'hashicorptools/host'

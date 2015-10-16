@@ -2,4 +2,6 @@
 
 require 'hashicorptools'
 
-Host.start(ARGV)
+Dotenv.load
+
+Hashicorptools::Host.start(ARGV)

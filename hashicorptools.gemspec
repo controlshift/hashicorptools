@@ -11,9 +11,10 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Nathan Woodhull"]
-  s.date = "2015-10-09"
+  s.date = "2015-10-15"
   s.description = "Wrappers for terraform and packer"
   s.email = "systems@controlshiftlabs.com"
+  s.executables = ["ec2_host"]
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
@@ -25,13 +26,15 @@ Gem::Specification.new do |s|
     "README.md",
     "Rakefile",
     "VERSION",
+    "bin/ec2_host",
     "data/standard-ami.json",
     "hashicorptools.gemspec",
-    "lib/ec2_utilities.rb",
     "lib/hashicorptools.rb",
-    "lib/packer.rb",
-    "lib/terraform.rb",
-    "lib/variables.rb",
+    "lib/hashicorptools/ec2_utilities.rb",
+    "lib/hashicorptools/host.rb",
+    "lib/hashicorptools/packer.rb",
+    "lib/hashicorptools/terraform.rb",
+    "lib/hashicorptools/variables.rb",
     "spec/hashicorptools_spec.rb",
     "spec/spec_helper.rb"
   ]

@@ -21,6 +21,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{Wrappers for terraform and packer}
   gem.email = "systems@controlshiftlabs.com"
   gem.authors = ["Nathan Woodhull"]
+  gem.executables = ['ec2_host'] 
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
