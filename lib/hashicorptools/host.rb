@@ -26,11 +26,16 @@ module Hashicorptools
 
       resp = ec2.describe_instances(filters: filters) 
       dns = resp.reservations.first.instances.first.public_dns_name
-      exec "ssh #{dns}"
+
+      exec "ssh #{ssh_user_fragment}#{dns}"
     end
 
 
-    private 
+    private
+
+    def ssh_user_fragment
+      ENV['AWS_SSH_USERNAME'].present ? "#{ENV['AWS_SSH_USERNAME']}@" : ''
+    end
 
     def filters
       filters = []
