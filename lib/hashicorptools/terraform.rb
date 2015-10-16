@@ -1,6 +1,6 @@
 module Hashicorptools
   class Terraform < Thor
-    TERRAFORM_VERSION = '0.6.3'
+    TERRAFORM_VERSION = '0.6.4'
 
     include Ec2Utilities
     include Variables
@@ -80,14 +80,18 @@ module Hashicorptools
     protected
 
     def encrypt_tfstate
+      enforce_tfstate_dependencies
       if File.exist?(state_path)
         system "openssl enc -aes-256-cbc -salt -in #{state_path} -out #{state_path}.enc -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
       end
     end
 
     def decrypt_tfstate
+      enforce_tfstate_dependencies
       if File.exist?("#{state_path}.enc")
         system "openssl enc -aes-256-cbc -d -in #{state_path}.enc -out #{state_path} -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
+      else
+        raise "Could not find #{state_path}.enc"
       end
     end
 
@@ -125,6 +129,10 @@ module Hashicorptools
       if Gem::Version.new(terraform_version) < Gem::Version.new(TERRAFORM_VERSION)
         raise "Terraform #{terraform_version} is out of date, please upgrade"
       end
+    end
+
+    def enforce_tfstate_dependencies
+      raise "must supply TFSTATE_ENCRYPTION_PASSWORD environmental variable" if ENV['TFSTATE_ENCRYPTION_PASSWORD'].blank?
     end
 
     def env_variable_keys
