@@ -50,6 +50,10 @@ module Hashicorptools
         filters << {name: 'tag:Name', values: [ options[:name] ]}
       end
 
+      if options[:role].present?
+        filters << {name: 'tag:role', values: [ options[:role] ]}
+      end
+
       filters
     end
   end
