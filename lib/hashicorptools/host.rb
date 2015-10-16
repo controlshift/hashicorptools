@@ -34,7 +34,7 @@ module Hashicorptools
     private
 
     def ssh_user_fragment
-      ENV['AWS_SSH_USERNAME'].present ? "#{ENV['AWS_SSH_USERNAME']}@" : ''
+      ENV['AWS_SSH_USERNAME'].present? ? "#{ENV['AWS_SSH_USERNAME']}@" : ''
     end
 
     def filters
