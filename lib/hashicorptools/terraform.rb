@@ -26,6 +26,7 @@ module Hashicorptools
 
           settings_overrides.merge!({app_environment: options[:environment]}.merge(env_variable_keys))
 
+          decrypt_tfstate
           send("before_#{cmd}")
           if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
             send("after_#{cmd}")
