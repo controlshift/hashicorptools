@@ -20,11 +20,11 @@ module Hashicorptools
       end
 
       no_commands do
-        define_method "_#{cmd}" do |asg_colors = nil, settings_overrides = {}|
+        define_method "_#{cmd}" do |settings_overrides = {}|
           enforce_version!
           raise 'invalid environment' unless ['staging', 'production'].include?(options[:environment])
 
-          settings_overrides.merge!({app_environment: options[:environment]}.merge(env_variable_keys))
+          settings_overrides.merge!({app_environment: options[:environment]}.merge(env_variable_keys).merge(settings))
 
           decrypt_tfstate
           send("before_#{cmd}")
@@ -134,6 +134,10 @@ module Hashicorptools
 
     def enforce_tfstate_dependencies
       raise "must supply TFSTATE_ENCRYPTION_PASSWORD environmental variable" if ENV['TFSTATE_ENCRYPTION_PASSWORD'].blank?
+    end
+
+    def settings
+      {} # override me to pass more variables into the terraform plan.
     end
 
     def env_variable_keys
