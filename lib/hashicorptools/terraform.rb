@@ -69,7 +69,7 @@ module Hashicorptools
     desc 'decrypt', 'decrypt upstream terraform changes into local statue'
     option :environment, :required => true
     def decrypt
-      decrypt_tfstate
+      decrypt_tfstate(true)
     end
 
     desc "console", "interactive session"
@@ -87,11 +87,11 @@ module Hashicorptools
       end
     end
 
-    def decrypt_tfstate
+    def decrypt_tfstate(enforce_file_existence=false)
       enforce_tfstate_dependencies
       if File.exist?("#{state_path}.enc")
         system "openssl enc -aes-256-cbc -d -in #{state_path}.enc -out #{state_path} -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
-      else
+      elsif enforce_file_existence
         raise "Could not find #{state_path}.enc"
       end
     end
