@@ -30,30 +30,24 @@ module Hashicorptools
     end
 
     def wait_until_instances_ready
-      groups.each do |group|
-        wait_until do
-          group = autoscaling.describe_auto_scaling_groups(auto_scaling_group_names: [group.auto_scaling_group_name]).auto_scaling_groups.first
-          group.instances.any?
-        end
-
-        group = autoscaling.describe_auto_scaling_groups(auto_scaling_group_names: [group.auto_scaling_group_name]).auto_scaling_groups.first
-        pending_instance_ids = group.instances.find_all{|i| ['Pending', 'Pending:Wait', 'Pending:Proceed'].include?(i.lifecycle_state) }.collect{|i| i.instance_id}
-        shutting_down_ids =  group.instances.find_all{|i| ['Terminating', 'Terminating:Wait', 'Terminating:Proceed'].include?(i.lifecycle_state) }.collect{|i| i.instance_id}
-        puts "waiting for #{group.auto_scaling_group_name} #{pending_instance_ids.size} servers to come online, #{shutting_down_ids.size} to terminate."
-
-        if pending_instance_ids.any?
-          # wait until all instances are running and returning a good system status check
-          ec2.wait_until(:instance_running, instance_ids: pending_instance_ids)
-          puts "waiting for instance status checks to pass.."
-          wait_until do
-            resp = ec2.describe_instance_status(instance_ids: pending_instance_ids)
-            resp.instance_statuses.find_all{|s| s.system_status.status != 'ok'}.none?
-          end
-        end
-
-        ec2.wait_until(:instance_terminated, instance_ids: shutting_down_ids)  if shutting_down_ids.any?
-        wait_for_activities_to_complete(group)
+      wait_until do
+        group.instances.any?
       end
+
+      pending_instance_ids = group.instances.find_all{|i| ['Pending', 'Pending:Wait', 'Pending:Proceed'].include?(i.lifecycle_state) }.collect{|i| i.instance_id}
+      shutting_down_ids =  group.instances.find_all{|i| ['Terminating', 'Terminating:Wait', 'Terminating:Proceed'].include?(i.lifecycle_state) }.collect{|i| i.instance_id}
+
+      ec2.wait_until(:instance_running, instance_ids: pending_instance_ids) if pending_instance_ids.any?
+      ec2.wait_until(:instance_terminated, instance_ids: shutting_down_ids)  if shutting_down_ids.any?
+
+      # now that all of the instances starting up / shutting down have settled, we can verify that running instances are healthy.
+      puts "waiting for instance status checks to pass.."
+      wait_until do
+        resp = ec2.describe_instance_status(instance_ids: group.instance_ids)
+        resp.instance_statuses.find_all{|s| s.system_status.status != 'ok'}.none?
+      end
+
+      wait_for_activities_to_complete(group)
     end
 
     def group
@@ -93,10 +87,6 @@ module Hashicorptools
 
     def ec2
       @ec2 ||= Aws::EC2::Client.new(region: 'us-east-1')
-    end
-
-    def elb
-
     end
 
     def groups
