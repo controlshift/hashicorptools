@@ -43,7 +43,7 @@ module Hashicorptools
       # now that all of the instances starting up / shutting down have settled, we can verify that running instances are healthy.
       puts "waiting for instance status checks to pass.."
       wait_until do
-        resp = ec2.describe_instance_status(instance_ids: group.instance_ids)
+        resp = ec2.describe_instance_status(instance_ids: group.instances.collect{|i| i.instance_id})
         resp.instance_statuses.find_all{|s| s.system_status.status != 'ok'}.none?
       end
 
