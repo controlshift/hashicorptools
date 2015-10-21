@@ -15,9 +15,11 @@ module Hashicorptools
     def set_desired_instances(desired_instances)
       puts "updating size of #{name} to #{desired_instances}"
       autoscaling.set_desired_capacity({auto_scaling_group_name: name, desired_capacity: desired_instances, honor_cooldown: false })
-      # sleep for a moment so AWS has a chance to start the activity.
-      puts "pausing for desired instance count to take effect..."
-      sleep(15)
+
+      # wait for the instance count to be correct.
+      wait_until do
+        group.instances.size == desired_instances
+      end
 
       groups.each do |group|
         wait_for_activities_to_complete(group)
