@@ -27,11 +27,19 @@ module Hashicorptools
           settings_overrides.merge!({app_environment: options[:environment]}.merge(env_variable_keys).merge(settings))
 
           decrypt_tfstate
-          send("before_#{cmd}")
-          if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
-            send("after_#{cmd}")
+
+          begin
+            send("before_#{cmd}")
+            if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
+              send("after_#{cmd}")
+            end
+          rescue StandardError => e
+            puts e.backtrace
+          ensure
+            # need to always ensure the most recent tfstate is encrypted again.
+            encrypt_tfstate
           end
-          encrypt_tfstate
+
         end
 
         define_method "before_#{cmd}" do
