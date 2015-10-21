@@ -34,6 +34,7 @@ module Hashicorptools
               send("after_#{cmd}")
             end
           rescue StandardError => e
+            puts e.message
             puts e.backtrace
           ensure
             # need to always ensure the most recent tfstate is encrypted again.
@@ -152,6 +153,12 @@ module Hashicorptools
 
     def settings
       {} # override me to pass more variables into the terraform plan.
+    end
+
+    def asg_launch_config_name(asg_name)
+      asg_client = Aws::AutoScaling::Client.new(region: 'us-east-1')
+      group = asg_client.describe_auto_scaling_groups(auto_scaling_group_names: [asg_name]).auto_scaling_groups.first
+      group.launch_configuration_name
     end
 
     def env_variable_keys
