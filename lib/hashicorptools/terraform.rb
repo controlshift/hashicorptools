@@ -72,6 +72,12 @@ module Hashicorptools
       decrypt_tfstate(true)
     end
 
+    desc 'encrypt', 'encrypt terraform local status'
+    option :environment, :required => true
+    def encrypt
+      encrypt_tfstate
+    end
+
     desc "console", "interactive session"
     def console
       require 'pry-byebug'
