@@ -25,15 +25,18 @@ module Hashicorptools
       ec2 = Aws::EC2::Client.new(region: 'us-east-1')
 
       resp = ec2.describe_instances(filters: filters(role))
-      instance = resp.reservations.first.instances.first
+      if resp.reservations.any?
+        instance = resp.reservations.first.instances.first
+        dns = if instance.public_dns_name.present?
+          instance.public_dns_name
+        else
+          instance.private_dns_name
+        end
 
-      dns = if instance.public_dns_name.present?
-        instance.public_dns_name
+        exec "ssh #{ssh_user_fragment}#{dns}"
       else
-        instance.private_dns_name
+        puts "no instances with #{role} role found"
       end
-
-      exec "ssh #{ssh_user_fragment}#{dns}"
     end
 
     private
