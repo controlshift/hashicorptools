@@ -239,5 +239,11 @@ module Hashicorptools
       raw_conf = File.read(state_path)
       @current_tfstate = JSON.parse(raw_conf)
     end
+
+    def read_config_file(path)
+      File.new('config/' + path).read
+      template = ERB.new File.new("config/#{path}").read, nil, "%"
+      template.result(OpenStruct.new(options).instance_eval { binding })
+    end
   end
 end
