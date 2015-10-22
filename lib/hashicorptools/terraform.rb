@@ -14,6 +14,7 @@ module Hashicorptools
     [:apply, :plan, :destroy, :pull, :refresh].each do |cmd|
       desc cmd, "terraform #{cmd}"
       option :environment, :required => true
+      option :debug, :required => false
 
       define_method cmd do
         send("_#{cmd}")
@@ -24,12 +25,19 @@ module Hashicorptools
           enforce_version!
           raise 'invalid environment' unless ['staging', 'production'].include?(options[:environment])
 
-          settings_overrides.merge!({app_environment: options[:environment]}.merge(env_variable_keys).merge(settings))
+          settings_overrides
+            .merge!({ app_environment: options[:environment] }
+            .merge(env_variable_keys)
+            .merge(settings)
+            .merge(shared_plan_variables))
 
-          decrypt_tfstate
+          decrypt_tfstate(state_path)
 
           begin
             send("before_#{cmd}")
+            if (options[:debug])
+              puts "[DEBUG] running command: 'terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}'"
+            end
             if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
               send("after_#{cmd}")
             end
@@ -38,7 +46,7 @@ module Hashicorptools
             puts e.backtrace
           ensure
             # need to always ensure the most recent tfstate is encrypted again.
-            encrypt_tfstate
+            encrypt_tfstate(state_path)
           end
 
         end
@@ -53,13 +61,34 @@ module Hashicorptools
           # no-op
         end
       end
+
+      desc cmd, "terraform #{cmd} for shared plan"
+      define_method "shared_#{cmd}" do
+        enforce_version!
+
+        decrypt_tfstate(shared_state_path)
+
+        begin
+          system "terraform #{cmd} #{variables(env_variable_keys.merge(settings))} -state #{shared_state_path} #{shared_config_directory}"
+        rescue StandardError => e
+          puts e.message
+          puts e.backtrace
+        ensure
+          # need to always ensure the most recent tfstate is encrypted again.
+          encrypt_tfstate(shared_state_path)
+        end
+      end
+    end
+
+    [:shared_apply, :shared_plan, :shared_destroy, :shared_pull, :shared_refresh].each do |cmd|
+
     end
 
     desc 'output', 'terraform output'
     option :environment, :required => true
     option :name, :required => true
     def output
-      system output_cmd(options[:name])
+      system output_cmd(state_path, options[:name])
     end
 
     desc 'taint', 'terraform taint'
@@ -75,16 +104,26 @@ module Hashicorptools
       system "terraform show #{state_path}"
     end
 
-    desc 'decrypt', 'decrypt upstream terraform changes into local statue'
+    desc 'decrypt', 'decrypt upstream terraform changes into local status'
     option :environment, :required => true
     def decrypt
-      decrypt_tfstate(true)
+      decrypt_tfstate(state_path, true)
+    end
+
+    desc 'shared_decrypt', 'decrypt upstream shared terraform changes into local status'
+    def shared_decrypt
+      decrypt_tfstate(shared_state_path, true)
     end
 
     desc 'encrypt', 'encrypt terraform local status'
     option :environment, :required => true
     def encrypt
-      encrypt_tfstate
+      encrypt_tfstate(state_path)
+    end
+
+    desc 'shared_encrypt', 'encrypt shared terraform state local status'
+    def shared_encrypt
+      encrypt_tfstate(shared_state_path)
     end
 
     desc "console", "interactive session"
@@ -95,19 +134,19 @@ module Hashicorptools
 
     protected
 
-    def encrypt_tfstate
+    def encrypt_tfstate(state_file_path)
       enforce_tfstate_dependencies
-      if File.exist?(state_path)
-        system "openssl enc -aes-256-cbc -salt -in #{state_path} -out #{state_path}.enc -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
+      if File.exist?(state_file_path)
+        system "openssl enc -aes-256-cbc -salt -in #{state_file_path} -out #{state_file_path}.enc -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
       end
     end
 
-    def decrypt_tfstate(enforce_file_existence=false)
+    def decrypt_tfstate(state_file_path, enforce_file_existence=false)
       enforce_tfstate_dependencies
-      if File.exist?("#{state_path}.enc")
-        system "openssl enc -aes-256-cbc -d -in #{state_path}.enc -out #{state_path} -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
+      if File.exist?("#{state_file_path}.enc")
+        system "openssl enc -aes-256-cbc -d -in #{state_file_path}.enc -out #{state_file_path} -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
       elsif enforce_file_existence
-        raise "Could not find #{state_path}.enc"
+        raise "Could not find #{state_file_path}.enc"
       end
     end
 
@@ -115,8 +154,16 @@ module Hashicorptools
       "#{config_environment_path}/#{options[:environment]}.tfstate"
     end
 
+    def shared_state_path
+      "#{shared_config_directory}/shared.tfstate"
+    end
+
     def config_directory
       "config/infrastructure/#{infrastructure}"
+    end
+
+    def shared_config_directory
+      "config/infrastructure/#{infrastructure}/shared"
     end
 
     def config_environment_path
@@ -127,12 +174,12 @@ module Hashicorptools
       raise 'implement me'
     end
 
-    def output_cmd(name)
-      "terraform output -state=#{state_path} #{name}"
+    def output_cmd(state_file_path, name=nil)
+      "terraform output -state=#{state_file_path} #{name}"
     end
 
-    def output_variable(name)
-      `#{output_cmd(name)}`.chomp
+    def output_variable(state_file_path, name)
+      `#{output_cmd(state_file_path, name)}`.chomp
     end
 
     def terraform_version
@@ -170,6 +217,21 @@ module Hashicorptools
         items[key] = ENV[key.to_s.upcase]
       end
       items
+    end
+
+    def shared_plan_variables
+      if File.exist?(shared_state_path)
+        raw_shared_plan_output = `#{output_cmd(shared_state_path)}`
+        shared_variables = {}
+        raw_shared_plan_output.split("\n").each do |output_var|
+          key, value = output_var.split("=")
+          shared_variables[key.strip] = value.strip
+        end
+
+        shared_variables
+      else
+        {}
+      end
     end
 
     def current_tfstate
