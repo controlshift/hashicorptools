@@ -36,7 +36,10 @@ module Hashicorptools
           begin
             send("before_#{cmd}")
 
-            terraform_command = "terraform #{cmd} #{variables(settings_overrides)} -var-file #{config_environment_path}/variables.tfvars -state #{state_path} #{config_directory}"
+            terraform_command = "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
+            if File.exist?("#{config_environment_path}/variables.tfvars")
+              terraform_command << " -var-file #{config_environment_path}/variables.tfvars"
+            end
 
             if (options[:debug])
               puts "[DEBUG] running command: '#{terraform_command}"
