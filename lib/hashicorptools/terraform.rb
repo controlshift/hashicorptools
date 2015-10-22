@@ -35,10 +35,13 @@ module Hashicorptools
 
           begin
             send("before_#{cmd}")
+
+            terraform_command = "terraform #{cmd} #{variables(settings_overrides)} -var-file #{config_environment_path}/variables.tfvars -state #{state_path} #{config_directory}"
+
             if (options[:debug])
-              puts "[DEBUG] running command: 'terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}'"
+              puts "[DEBUG] running command: '#{terraform_command}"
             end
-            if system "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{config_directory}"
+            if system terraform_command
               send("after_#{cmd}")
             end
           rescue StandardError => e
