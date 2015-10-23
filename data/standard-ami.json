@@ -15,7 +15,6 @@
       "region": "us-east-1",
       "source_ami": "{{user `source_ami`}}",
       "instance_type": "t2.micro",
-      "volume_type": "gp2",
       "ssh_username": "ubuntu",
       "ami_name": "{{user `ami_tag`}} {{timestamp}}",
       "tags": {
@@ -23,7 +22,13 @@
         "{{user `ami_tag`}}": "{{timestamp}}",
         "created_at": "{{isotime}}",
         "parent_ami": "{{user `source_ami`}}"
-      }
+      },
+      "launch_block_device_mappings": [{
+        "device_name": "/dev/sda1",
+        "volume_size": 8,
+        "volume_type": "gp2",
+        "delete_on_termination": true
+      }]
     }
   ],
   "provisioners": [
