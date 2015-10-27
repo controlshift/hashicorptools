@@ -23,6 +23,10 @@
         "created_at": "{{isotime}}",
         "parent_ami": "{{user `source_ami`}}"
       },
+      "run_tags": {
+        "kind": "packer",
+        "role": "AMI builder"
+      },
       "launch_block_device_mappings": [{
         "device_name": "/dev/sda1",
         "volume_size": 8,
