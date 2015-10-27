@@ -108,7 +108,13 @@ module Hashicorptools
 
     def wait_until
       Timeout.timeout(360) do
-        sleep(3) until value = yield
+        seconds_to_sleep = 3
+
+        until value = yield do
+          sleep(seconds_to_sleep)
+          seconds_to_sleep *= 2
+        end
+
         value
       end
     end
