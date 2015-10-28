@@ -228,6 +228,7 @@ module Hashicorptools
     end
 
     def shared_plan_variables
+      decrypt_tfstate(shared_state_path, false)
       if File.exist?(shared_state_path)
         raw_shared_plan_output = `#{output_cmd(shared_state_path)}`
         shared_variables = {}
