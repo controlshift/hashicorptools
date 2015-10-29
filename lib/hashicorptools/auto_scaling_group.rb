@@ -112,7 +112,7 @@ module Hashicorptools
 
         until value = yield do
           sleep(seconds_to_sleep)
-          seconds_to_sleep *= 2
+          seconds_to_sleep *= 5
         end
 
         value
