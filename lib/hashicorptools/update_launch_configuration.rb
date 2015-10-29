@@ -1,6 +1,6 @@
 module Hashicorptools
   class UpdateLaunchConfiguration < Thor
-    desc 'deploy', 'cycle a new LC into prod'
+    desc 'deploy ASG_NAME', 'recycle instances in the ASG with no downtime'
     def deploy(asg_name)
       asg = AutoScalingGroup.new(name: asg_name)
       if asg.group.nil?
