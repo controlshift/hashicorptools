@@ -243,6 +243,10 @@ module Hashicorptools
       end
     end
 
+    def fetch_terraform_modules
+      system "terraform get -update=true #{config_directory}"
+    end
+
     def current_tfstate
       return @current_tfstate if defined?(@current_tfstate)
       raw_conf = File.read(state_path)
