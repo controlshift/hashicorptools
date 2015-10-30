@@ -18,9 +18,12 @@ module Hashicorptools
 
       # wait for the instance count to be correct.
       wait_until do
-        group.instances.size == desired_instances
+        current_size = group.instances.size
+        puts "asg currently has #{current_size} instances"
+        current_size == desired_instances
       end
 
+      puts "waiting for scaling events to finish"
       groups.each do |group|
         wait_for_activities_to_complete(group)
       end
@@ -43,8 +46,14 @@ module Hashicorptools
       # now that all of the instances starting up / shutting down have settled, we can verify that running instances are healthy.
       puts "waiting for instance status checks to pass.."
       wait_until do
+        puts "checking instance statuses"
         resp = ec2.describe_instance_status(instance_ids: group.instances.collect{|i| i.instance_id})
-        resp.instance_statuses.find_all{|s| s.system_status.status != 'ok'}.none?
+        resp.instance_statuses.all?{|s| s.system_status.status == 'ok'}
+      end
+
+      puts "waiting for ELB health checks to pass..."
+      wait_until do
+        all_load_balancers_at_full_health?
       end
 
       wait_for_activities_to_complete(group)
@@ -52,6 +61,17 @@ module Hashicorptools
 
     def group
       groups.first
+    end
+
+    def all_load_balancers_at_full_health?
+      names = group.load_balancer_names
+      names.each do |lb_name|
+        inst_health = elb.describe_instance_health({load_balancer_name: name})
+        unless inst_health.instance_states.all?{|inst| inst.state == 'InService'}
+          return false
+        end
+      end
+      return true
     end
 
     def delete!
@@ -72,9 +92,11 @@ module Hashicorptools
 
     def wait_for_activities_to_complete(group)
       autoscaling.describe_scaling_activities(auto_scaling_group_name: group.auto_scaling_group_name).activities.each do |activity|
-        if activity.status_code != 'Successful' || activity.status_code != 'Cancelled'
+        unless activity.status_code == 'Successful' || activity.status_code == 'Failed' || activity.status_code == 'Cancelled'
+          puts "waiting for #{activity.status_code} activity to finish: #{activity.description}..."
           wait_until do
             activity = autoscaling.describe_scaling_activities(auto_scaling_group_name: group.auto_scaling_group_name, activity_ids: [activity.activity_id]).activities.first
+            puts "#{activity.status_code}"
             activity.status_code == 'Successful' || activity.status_code == 'Failed' || activity.status_code == 'Cancelled'
           end
         end
@@ -87,6 +109,10 @@ module Hashicorptools
 
     def ec2
       @ec2 ||= Aws::EC2::Client.new(region: 'us-east-1')
+    end
+
+    def elb
+      @elb ||= Aws::ElasticLoadBalancing::Client.new(region: 'us-east-1')
     end
 
     def groups
@@ -108,11 +134,11 @@ module Hashicorptools
 
     def wait_until
       Timeout.timeout(360) do
-        seconds_to_sleep = 3
+        seconds_to_sleep = 10
 
         until value = yield do
           sleep(seconds_to_sleep)
-          seconds_to_sleep *= 5
+          seconds_to_sleep *= 3
         end
 
         value
