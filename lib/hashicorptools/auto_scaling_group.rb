@@ -95,7 +95,7 @@ module Hashicorptools
       autoscaling.describe_scaling_activities(auto_scaling_group_name: group.auto_scaling_group_name).activities.each do |activity|
         unless activity.status_code == 'Successful' || activity.status_code == 'Failed' || activity.status_code == 'Cancelled'
           puts "waiting for #{activity.status_code} activity to finish: #{activity.description}..."
-          wait_until do
+          wait_until(6000) do
             activity = autoscaling.describe_scaling_activities(auto_scaling_group_name: group.auto_scaling_group_name, activity_ids: [activity.activity_id]).activities.first
             puts "#{activity.status_code}"
             activity.status_code == 'Successful' || activity.status_code == 'Failed' || activity.status_code == 'Cancelled'
@@ -133,8 +133,8 @@ module Hashicorptools
       wait_for_activities_to_complete(group)
     end
 
-    def wait_until
-      Timeout.timeout(360) do
+    def wait_until(max_time=360)
+      Timeout.timeout(max_time) do
         seconds_to_sleep = 10
 
         until value = yield do
