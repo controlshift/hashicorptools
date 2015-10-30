@@ -66,7 +66,8 @@ module Hashicorptools
     def all_load_balancers_at_full_health?
       names = group.load_balancer_names
       names.each do |lb_name|
-        inst_health = elb.describe_instance_health({load_balancer_name: name})
+        puts "checking health of instances in #{lb_name}"
+        inst_health = elb.describe_instance_health({load_balancer_name: lb_name})
         unless inst_health.instance_states.all?{|inst| inst.state == 'InService'}
           return false
         end
