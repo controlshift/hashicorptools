@@ -18,7 +18,6 @@ module Hashicorptools
 
     desc "console", "interactive session"
     def console
-      require 'pry-byebug'
       ec2 = Aws::EC2::Client.new(region: 'us-east-1')
       require 'byebug'
       byebug
