@@ -20,7 +20,8 @@ module Hashicorptools
     def console
       require 'pry-byebug'
       ec2 = Aws::EC2::Client.new(region: 'us-east-1')
-      binding.pry
+      require 'byebug'
+      byebug
     end
 
     desc "list", "list all available telize amis"
@@ -46,8 +47,8 @@ module Hashicorptools
       ec2.create_tags( resources: run_instances_resp.instances.collect{|i| i.instance_id },
           tags: [ {key: 'Name', value: "packer test boot #{tag_name}"}, {key: 'environment', value: 'packer-development'}, {key: 'temporary', value: 'kill me'}])
 
-      require 'pry-byebug'
-      binding.pry
+      require 'byebug'
+      byebug
     end
 
     protected
