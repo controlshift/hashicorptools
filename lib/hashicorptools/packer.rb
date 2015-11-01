@@ -18,7 +18,6 @@ module Hashicorptools
 
     desc "console", "interactive session"
     def console
-      ec2 = Aws::EC2::Client.new(region: 'us-east-1')
       require 'byebug'
       byebug
     end
@@ -37,7 +36,6 @@ module Hashicorptools
 
     desc "boot", "start up an instance of the latest version of AMI" 
     def boot
-      ec2 = Aws::EC2::Client.new(region: 'us-east-1')
       run_instances_resp = ec2.run_instances(image_id: current_ami('base-image').image_id,
         min_count: 1,
         max_count: 1,
@@ -86,10 +84,29 @@ module Hashicorptools
       File.join(datadir_path, 'standard-ami.json')
     end
 
+    def auto_scaling
+      @auto_scaling ||= Aws::AutoScaling::Client.new(region: 'us-east-1')
+    end
+
+    def ec2
+      @ec2 ||= Aws::EC2::Client.new(region: 'us-east-1')
+    end
+
+    def amis_in_use
+      launch_configs = auto_scaling.describe_launch_configurations
+      image_ids = launch_configs.data['launch_configurations'].collect{|lc| lc.image_id}.flatten
+
+      ec2_reservations = ec2.describe_instances
+      image_ids << ec2_reservations.reservations.collect{|res| res.instances.collect{|r| r.image_id}}.flatten
+      image_ids.flatten
+    end
+
     def clean_amis
-      if amis.size > NUMBER_OF_AMIS_TO_KEEP
-        amis_to_remove = amis[NUMBER_OF_AMIS_TO_KEEP..-1]
-        amis_to_keep = amis[0..(NUMBER_OF_AMIS_TO_KEEP-1)]
+      potential_amis_to_remove = amis - amis_in_use
+
+      if potential_amis_to_remove.size > NUMBER_OF_AMIS_TO_KEEP
+        amis_to_remove = potential_amis_to_remove[NUMBER_OF_AMIS_TO_KEEP..-1]
+        amis_to_keep = potential_amis_to_remove[0..(NUMBER_OF_AMIS_TO_KEEP-1)]
 
         puts "Deregistering old AMIs..."
         amis_to_remove.each do |ami|
