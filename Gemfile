@@ -3,6 +3,8 @@ source "http://rubygems.org"
 # try to slowly migrate to v2 of the aws api
 gem 'aws-sdk', '~> 2'
 
+gem 'dynect_rest'
+
 gem 'aws-sdk-v1'
 gem 'dotenv'
 gem 'thor'

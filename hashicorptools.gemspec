@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Nathan Woodhull"]
-  s.date = "2015-10-16"
+  s.date = "2015-11-05"
   s.description = "Wrappers for terraform and packer"
   s.email = "systems@controlshiftlabs.com"
   s.executables = ["ec2_host"]
@@ -30,10 +30,12 @@ Gem::Specification.new do |s|
     "data/standard-ami.json",
     "hashicorptools.gemspec",
     "lib/hashicorptools.rb",
+    "lib/hashicorptools/auto_scaling_group.rb",
     "lib/hashicorptools/ec2_utilities.rb",
     "lib/hashicorptools/host.rb",
     "lib/hashicorptools/packer.rb",
     "lib/hashicorptools/terraform.rb",
+    "lib/hashicorptools/update_launch_configuration.rb",
     "lib/hashicorptools/variables.rb",
     "spec/hashicorptools_spec.rb",
     "spec/spec_helper.rb"
@@ -48,6 +50,7 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<aws-sdk>, ["~> 2"])
+      s.add_runtime_dependency(%q<dynect_rest>, [">= 0"])
       s.add_runtime_dependency(%q<aws-sdk-v1>, [">= 0"])
       s.add_runtime_dependency(%q<dotenv>, [">= 0"])
       s.add_runtime_dependency(%q<thor>, [">= 0"])
@@ -60,6 +63,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, [">= 0"])
     else
       s.add_dependency(%q<aws-sdk>, ["~> 2"])
+      s.add_dependency(%q<dynect_rest>, [">= 0"])
       s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
       s.add_dependency(%q<dotenv>, [">= 0"])
       s.add_dependency(%q<thor>, [">= 0"])
@@ -73,6 +77,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<aws-sdk>, ["~> 2"])
+    s.add_dependency(%q<dynect_rest>, [">= 0"])
     s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
     s.add_dependency(%q<dotenv>, [">= 0"])
     s.add_dependency(%q<thor>, [">= 0"])
