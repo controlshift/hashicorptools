@@ -258,5 +258,13 @@ module Hashicorptools
       template = ERB.new File.new("config/#{path}").read, nil, "%"
       template.result(OpenStruct.new(options).instance_eval { binding })
     end
+
+    def dynect
+      @dynect ||= DynectRest.new("controlshiftlabs", ENV['DYNECT_USERNAME'], ENV['DYNECT_PASSWORD'], "controlshiftlabs.com")
+    end
+
+    def dns_record_exists?(parent_node_fqdn, record)
+      dynect.node_list(nil, parent_node_fqdn).include?(record.fqdn)
+    end
   end
 end
