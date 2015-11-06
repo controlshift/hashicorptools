@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Nathan Woodhull"]
-  s.date = "2015-11-05"
+  s.date = "2015-11-06"
   s.description = "Wrappers for terraform and packer"
   s.email = "systems@controlshiftlabs.com"
   s.executables = ["ec2_host"]
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
     "hashicorptools.gemspec",
     "lib/hashicorptools.rb",
     "lib/hashicorptools/auto_scaling_group.rb",
+    "lib/hashicorptools/code_deploy.rb",
     "lib/hashicorptools/ec2_utilities.rb",
     "lib/hashicorptools/host.rb",
     "lib/hashicorptools/packer.rb",
@@ -56,6 +57,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<thor>, [">= 0"])
       s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_runtime_dependency(%q<byebug>, [">= 0"])
+      s.add_runtime_dependency(%q<git>, [">= 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
@@ -69,6 +71,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<thor>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<byebug>, [">= 0"])
+      s.add_dependency(%q<git>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
@@ -83,6 +86,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<thor>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<byebug>, [">= 0"])
+    s.add_dependency(%q<git>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.8.0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])
