@@ -10,6 +10,7 @@ gem 'dotenv'
 gem 'thor'
 gem 'activesupport'
 gem 'byebug'
+gem 'git'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

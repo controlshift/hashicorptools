@@ -111,6 +111,7 @@ DEPENDENCIES
   byebug
   dotenv
   dynect_rest
+  git
   jeweler (~> 2.0.1)
   rdoc (~> 3.12)
   rspec (~> 2.8.0)
