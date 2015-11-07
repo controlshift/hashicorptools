@@ -133,7 +133,7 @@ module Hashicorptools
       wait_for_activities_to_complete(group)
     end
 
-    def wait_until(max_time=360)
+    def wait_until(max_time=420)
       Timeout.timeout(max_time) do
         seconds_to_sleep = 10
 
