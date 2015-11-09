@@ -12,13 +12,19 @@ module Hashicorptools
     desc 'deploy', 'deploy latest code to environment'
     option :environment, :required => true
     option :branch, default: 'master'
+    option :commit
     def deploy
-
       g = Git.open('..')
-      g.checkout(options[:branch].to_sym)
-      commit = g.log.first
 
-      puts "latest commit: #{commit.sha} #{commit.message}"
+      commit = if options[:commit].present?
+                 g.gcommit(options[:commit])
+               else
+                 g.checkout(options[:branch].to_sym)
+                 g.log.first
+               end
+
+
+      puts "deploying commit: #{commit.sha} #{commit.message}"
 
       create_deployment(commit.sha, commit.message)
     end
