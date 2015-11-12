@@ -217,14 +217,7 @@ module Hashicorptools
     end
 
     def env_variable_keys
-      items = {}
-
-      [:postgres_password, :embedly_key, :honeybadger_api_key, :honeybadger_public_key, :statsd_host, :statsd_namespace,
-       :change_org_key, :change_org_secret, :airbrake_api_key, :sendgrid_username, :sendgrid_password, :open_exchange_rate_id,
-       :fog_directory].each do |key|
-        items[key] = ENV[key.to_s.upcase]
-      end
-      items
+      {} # override me to pass environmental variables into the terraform plan
     end
 
     def shared_plan_variables
