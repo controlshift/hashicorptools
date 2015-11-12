@@ -190,6 +190,17 @@ module Hashicorptools
       `#{output_cmd(state_file_path, name)}`.chomp
     end
 
+    def output_variables(state_file_path)
+      raw_plan_output = `#{output_cmd(state_file_path)}`
+      output_vars = {}
+      raw_plan_output.split("\n").each do |output_var|
+        key, value = output_var.split("=")
+        output_vars[key.strip] = value.strip
+      end
+
+      output_vars
+    end
+
     def terraform_version
       version_string = `terraform version`.chomp
       version = /(\d+.\d+.\d+)/.match(version_string)
@@ -223,14 +234,7 @@ module Hashicorptools
     def shared_plan_variables
       decrypt_tfstate(shared_state_path, false)
       if File.exist?(shared_state_path)
-        raw_shared_plan_output = `#{output_cmd(shared_state_path)}`
-        shared_variables = {}
-        raw_shared_plan_output.split("\n").each do |output_var|
-          key, value = output_var.split("=")
-          shared_variables[key.strip] = value.strip
-        end
-
-        shared_variables
+        output_variables(shared_state_path)
       else
         {}
       end
