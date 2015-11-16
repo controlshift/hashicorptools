@@ -39,7 +39,35 @@ module Hashicorptools
       end
     end
 
+    desc 'console', 'run the agra rails console'
+    option :environment, required: false
+    def console
+      ec2 = Aws::EC2::Client.new(region: 'us-east-1')
+
+      bastion_dns = dns_from_reservations(ec2.describe_instances(filters: filters('console', 'maintenance')))
+      agra_console_dns = dns_from_reservations(ec2.describe_instances(filters: filters('console', 'agra')))
+
+
+      if bastion_dns &&  agra_console_dns
+        exec "ssh -t #{ssh_user_fragment}#{bastion_dns} 'ssh -t #{ssh_user_fragment}#{agra_console_dns}'"
+      else
+        puts "no instances found"
+      end
+    end
+
     private
+
+    def dns_from_reservations(resp)
+      if resp.reservations.any?
+        instance = resp.reservations.first.instances.first
+        if instance.public_dns_name.present?
+          instance.public_dns_name
+        else
+          instance.private_dns_name
+        end
+      end
+    end
+
 
     def application_environment
       if options[:environment].present?
@@ -55,7 +83,7 @@ module Hashicorptools
       ENV['AWS_SSH_USERNAME'].present? ? "#{ENV['AWS_SSH_USERNAME']}@" : ''
     end
 
-    def filters(role = '')
+    def filters(role = '', kind='')
       filters = []
 
       filters << {name: 'instance-state-name', values: ['running']}
@@ -74,6 +102,10 @@ module Hashicorptools
 
       if role.present?
         filters << {name: 'tag:role', values: [ role ]}
+      end
+
+      if kind.present?
+        filters << {name: 'tag:kind', values: [ kind ]}
       end
 
       filters
