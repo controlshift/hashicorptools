@@ -6,7 +6,7 @@ module Hashicorptools
       if asg.group.nil?
         raise "could not find asg #{asg_name}"
       end
-      current_count = asg.group.instances.size
+      current_count = asg.group.instances.size || 1
 
       if asg.group.max_size < (current_count * 2)
         raise "max size must be more than twice current count to deploy a new AMI"
