@@ -102,7 +102,10 @@ module Hashicorptools
     end
 
     def clean_amis
-      potential_amis_to_remove = amis - amis_in_use
+      ami_ids = amis.collect{|a| a.image_id}
+      ami_ids_to_remove = ami_ids - amis_in_use
+      potential_amis_to_remove = amis
+      potential_amis_to_remove.keep_if {|a| ami_ids_to_remove.include?(a.image_id) }
 
       if potential_amis_to_remove.size > NUMBER_OF_AMIS_TO_KEEP
         amis_to_remove = potential_amis_to_remove[NUMBER_OF_AMIS_TO_KEEP..-1]
