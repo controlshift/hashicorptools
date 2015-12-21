@@ -80,7 +80,7 @@ module Hashicorptools
     end
 
     def ami_config_path
-      datadir_path = Gem.datadir('hashicorptools')
+      datadir_path = Gem.datadir('hashicorptools').gsub(/\/hashicorptools$/, '')  # workaround for bug in Gem.datadir
       File.join(datadir_path, 'standard-ami.json')
     end
 
