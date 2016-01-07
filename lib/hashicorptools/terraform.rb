@@ -100,8 +100,13 @@ module Hashicorptools
     desc 'taint', 'terraform taint'
     option :environment, :required => true
     option :name, :required => true
+    option :module, :required => false
     def taint
-      system "terraform taint -state #{state_path} #{options[:name]}"
+      if options[:module].present?
+        system "terraform taint -module #{options[:module]} -state #{state_path} #{options[:name]}"
+      else
+        system "terraform taint -state #{state_path} #{options[:name]}"
+      end
     end
 
     desc 'show', 'terraform show'
