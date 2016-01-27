@@ -213,13 +213,14 @@ module Hashicorptools
 
     def output_variables(state_file_path)
       raw_plan_output = `#{output_cmd(state_file_path)}`
-      output_vars = {}
-      raw_plan_output.split("\n").each do |output_var|
-        key, value = output_var.split("=")
-        output_vars[key.strip] = value.strip
-      end
+      parse_key_value_variables(raw_plan_output)
+    end
 
-      output_vars
+    def var_file_variables
+      raise "Vars file #{var_file_path} does not exist" unless File.exist?(var_file_path)
+
+      raw_var_file_variables = File.read(var_file_path)
+      parse_key_value_variables(raw_var_file_variables)
     end
 
     def terraform_version
@@ -283,6 +284,19 @@ module Hashicorptools
 
     def dns_record_exists?(parent_node_fqdn, record)
       dynect.node_list(nil, parent_node_fqdn).include?(record.fqdn)
+    end
+
+    private
+
+    def parse_key_value_variables(vars_string)
+      vars = {}
+      vars_string.split("\n").each do |string_var|
+        next if string_var.blank?
+        key, value = string_var.split("=")
+        vars[key.strip] = value.strip.gsub('"', '')
+      end
+
+      vars
     end
   end
 end
