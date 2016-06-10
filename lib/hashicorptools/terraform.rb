@@ -69,13 +69,18 @@ module Hashicorptools
       end
 
       desc cmd, "terraform #{cmd} for shared plan"
+      option :debug, :required => false
       define_method "shared_#{cmd}" do
         enforce_version!
 
         decrypt_file(shared_state_path)
 
         begin
-          system "terraform #{cmd} #{variables(env_variable_keys.merge(settings))} -state #{shared_state_path} #{shared_config_directory}"
+          terraform_command = "terraform #{cmd} #{variables(env_variable_keys.merge(settings))} -state #{shared_state_path} #{shared_config_directory}"
+          if (options[:debug])
+            puts "[DEBUG] running command: '#{terraform_command}"
+          end
+          system terraform_command
         rescue StandardError => e
           puts e.message
           puts e.backtrace
