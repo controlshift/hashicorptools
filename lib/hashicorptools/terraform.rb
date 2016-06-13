@@ -91,15 +91,17 @@ module Hashicorptools
       end
     end
 
-    [:shared_apply, :shared_plan, :shared_destroy, :shared_pull, :shared_refresh].each do |cmd|
-
-    end
-
     desc 'output', 'terraform output'
     option :environment, :required => true
     option :name, :required => true
     def output
       system output_cmd(state_path, options[:name])
+    end
+
+    desc 'shared_output', 'terraform output for shared plan'
+    option :name, :required => true
+    def shared_output
+      system output_cmd(shared_state_path, options[:name])
     end
 
     desc 'taint', 'terraform taint'
@@ -114,10 +116,26 @@ module Hashicorptools
       end
     end
 
+    desc 'shared_taint', 'terraform taint for shared plan'
+    option :name, :required => true
+    option :module, :required => false
+    def shared_taint
+      if options[:module].present?
+        system "terraform taint -module #{options[:module]} -state #{shared_state_path} #{options[:name]}"
+      else
+        system "terraform taint -state #{shared_state_path} #{options[:name]}"
+      end
+    end
+
     desc 'show', 'terraform show'
     option :environment, :required => true
     def show
       system "terraform show #{state_path}"
+    end
+
+    desc 'shared_show', 'terraform show for shared plan'
+    def shared_show
+      system "terraform show #{shared_state_path}"
     end
 
     [ {commands: [:decrypt, :encrypt], file_path_method: :state_path, desc: 'upstream terraform changes'},
