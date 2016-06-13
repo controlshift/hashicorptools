@@ -139,14 +139,18 @@ module Hashicorptools
       {commands: [:var_file_decrypt, :var_file_encrypt], file_path_method: :var_file_path, desc: 'tfvars file'} ].each do |crypto_commands|
 
         desc crypto_commands[:commands][0], "decrypt #{crypto_commands[:desc]}"
-        option :environment, :required => true
+        unless crypto_commands.to_s.match(/shared_.+/)
+          option :environment, :required => true
+        end
         define_method crypto_commands[:commands][0] do
           file_path = send(crypto_commands[:file_path_method])
           decrypt_file(file_path)
         end
 
         desc crypto_commands[:commands][1], "encrypt #{crypto_commands[:desc]}"
-        option :environment, :required => true
+        unless crypto_commands.to_s.match(/shared_.+/)
+          option :environment, :required => true
+        end
         define_method crypto_commands[:commands][1] do
           file_path = send(crypto_commands[:file_path_method])
           encrypt_file(file_path)
