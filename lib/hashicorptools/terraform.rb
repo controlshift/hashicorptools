@@ -25,17 +25,14 @@ module Hashicorptools
           enforce_version!
           raise 'invalid environment' unless ['staging', 'production'].include?(options[:environment])
 
-          settings_overrides
-            .merge!({ app_environment: options[:environment] }
-            .merge(env_variable_keys)
-            .merge(settings)
-            .merge(shared_plan_variables))
+          execute(state_path, var_file_path) do
 
-          decrypt_file(state_path)
-          decrypt_file(var_file_path)
+            settings_overrides
+              .merge!({ app_environment: options[:environment] }
+              .merge(env_variable_keys)
+              .merge(settings)
+              .merge(shared_plan_variables))
 
-
-          begin
             send("before_#{cmd}")
 
             terraform_command = "terraform #{cmd} #{variables(settings_overrides)} -state #{state_path} #{var_file_param} #{config_directory}"
@@ -43,18 +40,13 @@ module Hashicorptools
             if (options[:debug])
               puts "[DEBUG] running command: '#{terraform_command}"
             end
-            if system terraform_command
+
+            result = system terraform_command
+
+            if result
               send("after_#{cmd}")
             end
-          rescue StandardError => e
-            puts e.message
-            puts e.backtrace
-          ensure
-            # need to always ensure the most recent tfstate is encrypted again.
-            encrypt_file(state_path)
-            delete_decrypted_var_file
           end
-
         end
 
         define_method "before_#{cmd}" do
@@ -73,20 +65,12 @@ module Hashicorptools
       define_method "shared_#{cmd}" do
         enforce_version!
 
-        decrypt_file(shared_state_path)
-
-        begin
+        execute(shared_state_path) do
           terraform_command = "terraform #{cmd} #{variables(env_variable_keys.merge(settings))} -state #{shared_state_path} #{shared_config_directory}"
           if (options[:debug])
             puts "[DEBUG] running command: '#{terraform_command}"
           end
           system terraform_command
-        rescue StandardError => e
-          puts e.message
-          puts e.backtrace
-        ensure
-          # need to always ensure the most recent tfstate is encrypted again.
-          encrypt_file(shared_state_path)
         end
       end
     end
@@ -95,13 +79,17 @@ module Hashicorptools
     option :environment, :required => true
     option :name, :required => true
     def output
-      system output_cmd(state_path, options[:name])
+      execute(state_path) do
+        system output_cmd(state_path, options[:name])
+      end
     end
 
     desc 'shared_output', 'terraform output for shared plan'
     option :name, :required => true
     def shared_output
-      system output_cmd(shared_state_path, options[:name])
+      execute(shared_state_path) do
+        system output_cmd(shared_state_path, options[:name])
+      end
     end
 
     desc 'taint', 'terraform taint'
@@ -109,10 +97,12 @@ module Hashicorptools
     option :name, :required => true
     option :module, :required => false
     def taint
-      if options[:module].present?
-        system "terraform taint -module #{options[:module]} -state #{state_path} #{options[:name]}"
-      else
-        system "terraform taint -state #{state_path} #{options[:name]}"
+      execute(state_path) do
+        if options[:module].present?
+          system "terraform taint -module #{options[:module]} -state #{state_path} #{options[:name]}"
+        else
+          system "terraform taint -state #{state_path} #{options[:name]}"
+        end
       end
     end
 
@@ -120,22 +110,28 @@ module Hashicorptools
     option :name, :required => true
     option :module, :required => false
     def shared_taint
-      if options[:module].present?
-        system "terraform taint -module #{options[:module]} -state #{shared_state_path} #{options[:name]}"
-      else
-        system "terraform taint -state #{shared_state_path} #{options[:name]}"
+      execute(shared_state_path) do
+        if options[:module].present?
+          system "terraform taint -module #{options[:module]} -state #{shared_state_path} #{options[:name]}"
+        else
+          system "terraform taint -state #{shared_state_path} #{options[:name]}"
+        end
       end
     end
 
     desc 'show', 'terraform show'
     option :environment, :required => true
     def show
-      system "terraform show #{state_path}"
+      execute(state_path) do
+        system "terraform show #{state_path}"
+      end
     end
 
     desc 'shared_show', 'terraform show for shared plan'
     def shared_show
-      system "terraform show #{shared_state_path}"
+      execute(shared_state_path) do
+        system "terraform show #{shared_state_path}"
+      end
     end
 
     [ {commands: [:decrypt, :encrypt], file_path_method: :state_path, desc: 'upstream terraform changes'},
@@ -169,6 +165,25 @@ module Hashicorptools
       File.exist?(var_file_path) ?
         "-var-file #{var_file_path}" :
         ""
+    end
+
+    def execute(state_file_path, var_file_path=nil)
+      decrypt_file(state_file_path)
+      if var_file_path
+        decrypt_file(var_file_path)
+      end
+
+      begin
+        yield
+      rescue StandardError => e
+        puts e.message
+        puts e.backtrace
+      ensure
+        encrypt_file(state_path)
+        if var_file_path
+          delete_decrypted_var_file
+        end
+      end
     end
 
     def delete_decrypted_var_file
