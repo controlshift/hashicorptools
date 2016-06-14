@@ -183,7 +183,7 @@ module Hashicorptools
         puts e.message
         puts e.backtrace
       ensure
-        encrypt_file(state_path)
+        encrypt_file(state_file_path)
         if var_file_path
           delete_decrypted_var_file
         end
