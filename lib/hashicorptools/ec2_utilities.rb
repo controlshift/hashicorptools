@@ -9,7 +9,13 @@ module Hashicorptools
     end
 
     def ec2
-      ec2 = AWS::EC2.new
+      reg = if self.respond_to?(:region)
+              self.region
+            else
+              'us-east-1'
+            end
+
+      AWS::EC2.new(region: reg)
     end
 
     def vpc_with_name(name)
