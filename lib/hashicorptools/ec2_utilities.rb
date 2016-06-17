@@ -9,7 +9,7 @@ module Hashicorptools
     end
 
     def ec2
-      reg = if self.respond_to?(:region)
+      reg = if self.methods.include?(:region)
               self.region
             else
               'us-east-1'
