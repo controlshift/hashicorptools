@@ -84,12 +84,16 @@ module Hashicorptools
       File.join(datadir_path, 'standard-ami.json')
     end
 
+    def region
+      'us-east-1'
+    end
+
     def auto_scaling
-      @auto_scaling ||= Aws::AutoScaling::Client.new(region: 'us-east-1')
+      @auto_scaling ||= Aws::AutoScaling::Client.new(region: region)
     end
 
     def ec2_v2
-      @ec2 ||= Aws::EC2::Client.new(region: 'us-east-1')
+      @ec2 ||= Aws::EC2::Client.new(region: region)
     end
 
     def amis_in_use
