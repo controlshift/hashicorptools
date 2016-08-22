@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
   s.files = [
-    ".travis.yaml",
+    ".travis.yml",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE",
