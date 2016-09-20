@@ -71,6 +71,10 @@ module Hashicorptools
       current_ami('base-image').image_id
     end
 
+    def format_variable(key, value)
+      "-var '#{key}=#{value}'"
+    end
+
     def tag_name
       raise 'implement me'
     end

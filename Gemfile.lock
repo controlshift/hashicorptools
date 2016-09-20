@@ -119,6 +119,3 @@ DEPENDENCIES
   rspec (~> 2.8.0)
   simplecov
   thor
-
-BUNDLED WITH
-   1.12.5

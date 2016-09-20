@@ -6,7 +6,13 @@ module Hashicorptools
     end
 
     def variables(settings_overrides = {})
-      aws_credentials_settings(settings_overrides).collect{|key,value| "-var '#{key}=\"#{value}\"'" }.join(' ')
+      aws_credentials_settings(settings_overrides).collect{|key,value| format_variable(key, value)}.join(' ')
+    end
+
+    protected
+
+    def format_variable(key, value)
+      "-var '#{key}=\"#{value}\"'"
     end
   end
 end
