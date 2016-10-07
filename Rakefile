@@ -11,8 +11,8 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
+require 'juwelier'
+Juwelier::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
   gem.name = "hashicorptools"
   gem.homepage = "http://github.com/woodhull/hashicorptools"
@@ -21,10 +21,10 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{Wrappers for terraform and packer}
   gem.email = "systems@controlshiftlabs.com"
   gem.authors = ["Nathan Woodhull"]
-  gem.executables = ['ec2_host'] 
+  gem.executables = ['ec2_host']
   # dependencies defined in Gemfile
 end
-Jeweler::RubygemsDotOrgTasks.new
+Juwelier::RubygemsDotOrgTasks.new
 
 require 'rspec/core'
 require 'rspec/core/rake_task'
