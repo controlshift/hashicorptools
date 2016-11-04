@@ -55,7 +55,15 @@ module Hashicorptools
       end
 
       no_commands do
+        define_method "before_shared_#{cmd}" do
+          # no-op
+        end
+
         define_method "after_#{cmd}" do
+          # no-op
+        end
+
+        define_method "after_shared_#{cmd}" do
           # no-op
         end
       end
@@ -66,11 +74,17 @@ module Hashicorptools
         enforce_version!
 
         execute(shared_state_path) do
+          send("before_shared_#{cmd}")
+
           terraform_command = "terraform #{cmd} #{variables(env_variable_keys.merge(settings))} -state #{shared_state_path} #{shared_config_directory}"
           if (options[:debug])
             puts "[DEBUG] running command: '#{terraform_command}"
           end
-          system terraform_command
+          result = system terraform_command
+
+          if result
+            send("after_shared_#{cmd}")
+          end
         end
       end
     end
