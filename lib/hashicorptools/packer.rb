@@ -22,7 +22,7 @@ module Hashicorptools
       byebug
     end
 
-    desc "list", "list all available telize amis"
+    desc "list", "list all available amis"
     def list
       amis.each do |ami|
         puts ami.image_id
@@ -34,7 +34,7 @@ module Hashicorptools
       clean_amis
     end
 
-    desc "boot", "start up an instance of the latest version of AMI" 
+    desc "boot", "start up an instance of the latest version of AMI"
     def boot
       run_instances_resp = ec2.run_instances(image_id: current_ami('base-image').image_id,
         min_count: 1,
@@ -121,6 +121,7 @@ module Hashicorptools
 
         puts "Deregistering old AMIs..."
         amis_to_remove.each do |ami|
+          delete_ami_snapshots(ami)
           puts "Deregistering #{ami.image_id}"
           ami.deregister
         end
@@ -131,6 +132,15 @@ module Hashicorptools
         end
       else
         puts "no AMIs to clean."
+      end
+    end
+
+    def delete_ami_snapshots(ami)
+      ebs_mappings = ami.block_device_mappings
+      ebs_mappings.each do |volume, attributes|
+        puts "Deleting snapshot #{attributes[:snapshot_id]} associated with AMI #{ami.image_id}"
+        snapshot = AWS::EC2::Snapshot.new(attributes[:snapshot_id])
+        snapshot.delete
       end
     end
   end
