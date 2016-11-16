@@ -121,9 +121,10 @@ module Hashicorptools
 
         puts "Deregistering old AMIs..."
         amis_to_remove.each do |ami|
-          delete_ami_snapshots(ami)
+          ebs_mappings = ami.block_device_mappings
           puts "Deregistering #{ami.image_id}"
           ami.deregister
+          delete_ami_snapshots(ebs_mappings)
         end
 
         puts "Currently active AMIs..."
@@ -135,10 +136,9 @@ module Hashicorptools
       end
     end
 
-    def delete_ami_snapshots(ami)
-      ebs_mappings = ami.block_device_mappings
+    def delete_ami_snapshots(ebs_mappings)
       ebs_mappings.each do |volume, attributes|
-        puts "Deleting snapshot #{attributes[:snapshot_id]} associated with AMI #{ami.image_id}"
+        puts "Deleting snapshot #{attributes[:snapshot_id]}"
         snapshot = AWS::EC2::Snapshot.new(attributes[:snapshot_id])
         snapshot.delete
       end
