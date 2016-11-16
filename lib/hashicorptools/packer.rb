@@ -34,6 +34,25 @@ module Hashicorptools
       clean_amis
     end
 
+    desc "clean_snapshots", "clean obsolete EBS snapshots not associated with any AMI"
+    def clean_snapshots
+      snapshots = ec2.snapshots.with_owner('self')
+      snapshots.each do |snapshot|
+        match = snapshot.description.match(/Created by CreateImage\(.+\) for (ami-[0-9a-f]+) from vol-.+/)
+        if match.nil?
+          puts "Skipping #{snapshot.id} - #{snapshot.description}"
+          next
+        end
+
+        ami_id = match[1]
+        unless ec2.images[ami_id].exists?
+          puts "Removing obsolete snapshot #{snapshot.id} - #{snapshot.description}"
+          snapshot = AWS::EC2::Snapshot.new(snapshot.id)
+          snapshot.delete
+        end
+      end
+    end
+
     desc "boot", "start up an instance of the latest version of AMI"
     def boot
       run_instances_resp = ec2.run_instances(image_id: current_ami('base-image').image_id,
