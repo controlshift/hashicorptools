@@ -1,6 +1,6 @@
 module Hashicorptools
   class Terraform < Thor
-    TERRAFORM_VERSION = '0.7.11'
+    TERRAFORM_VERSION = '0.9.1'
 
     include Ec2Utilities
     include Variables
