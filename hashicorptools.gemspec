@@ -46,7 +46,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://github.com/woodhull/hashicorptools"
   s.licenses = ["MIT"]
-  s.rubygems_version = "2.4.8"
+  s.rubygems_version = "2.6.8"
   s.summary = "Wrappers for terraform and packer"
 
   if s.respond_to? :specification_version then
