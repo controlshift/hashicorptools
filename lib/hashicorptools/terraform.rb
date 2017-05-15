@@ -148,29 +148,6 @@ module Hashicorptools
       end
     end
 
-    [ {commands: [:decrypt, :encrypt], file_path_method: :state_path, desc: 'upstream terraform changes'},
-      {commands: [:shared_decrypt, :shared_encrypt], file_path_method: :shared_state_path, desc: 'upstream shared terraform changes'},
-      {commands: [:var_file_decrypt, :var_file_encrypt], file_path_method: :var_file_path, desc: 'tfvars file'} ].each do |crypto_commands|
-
-        desc crypto_commands[:commands][0], "decrypt #{crypto_commands[:desc]}"
-        unless crypto_commands.to_s.match(/shared_.+/)
-          option :environment, :required => true
-        end
-        define_method crypto_commands[:commands][0] do
-          file_path = send(crypto_commands[:file_path_method])
-          decrypt_file(file_path)
-        end
-
-        desc crypto_commands[:commands][1], "encrypt #{crypto_commands[:desc]}"
-        unless crypto_commands.to_s.match(/shared_.+/)
-          option :environment, :required => true
-        end
-        define_method crypto_commands[:commands][1] do
-          file_path = send(crypto_commands[:file_path_method])
-          encrypt_file(file_path)
-        end
-    end
-
     desc "console", "interactive session"
     def console
       require 'pry-byebug'
@@ -186,48 +163,11 @@ module Hashicorptools
     end
 
     def execute(state_file_path, var_file_path=nil)
-      decrypt_file(state_file_path)
-      if var_file_path
-        decrypt_file(var_file_path)
-      end
-
       begin
         yield
       rescue StandardError => e
         puts e.message
         puts e.backtrace
-      ensure
-        encrypt_file(state_file_path)
-        if var_file_path
-          delete_decrypted_var_file
-        end
-      end
-    end
-
-    def delete_decrypted_var_file
-      return unless File.exist?(var_file_path)
-
-      enforce_cryptography_dependencies
-      if !File.exist?("#{var_file_path}.enc")
-        encrypt_file(var_file_path)
-      end
-
-      File.delete(var_file_path)
-    end
-
-    def encrypt_file(file_path)
-      enforce_cryptography_dependencies
-      if File.exist?(file_path)
-        system "openssl enc -aes-256-cbc -salt -in #{file_path} -out #{file_path}.enc -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
-      end
-    end
-
-    def decrypt_file(file_path, enforce_file_existence=false)
-      enforce_cryptography_dependencies
-      if File.exist?("#{file_path}.enc")
-        system "openssl enc -aes-256-cbc -d -in #{file_path}.enc -out #{file_path} -k #{ENV['TFSTATE_ENCRYPTION_PASSWORD']}"
-      elsif enforce_file_existence
-        raise "Could not find #{file_path}.enc"
       end
     end
 
@@ -291,10 +231,6 @@ module Hashicorptools
       end
     end
 
-    def enforce_cryptography_dependencies
-      raise "must supply TFSTATE_ENCRYPTION_PASSWORD environmental variable" if ENV['TFSTATE_ENCRYPTION_PASSWORD'].blank?
-    end
-
     def settings
       {} # override me to pass more variables into the terraform plan.
     end
@@ -310,7 +246,6 @@ module Hashicorptools
     end
 
     def shared_plan_variables
-      decrypt_file(shared_state_path, false)
       if File.exist?(shared_state_path)
         output_variables(shared_state_path)
       else
