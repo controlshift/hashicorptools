@@ -11,8 +11,7 @@ Wraps the packer product from hashicorp with standard configuration.
 
 ## terraform wrapper
 
-Wraps the terraform product from hashicorp with standard conventions for encrypting tfstate and segmenting production
-and staging environments.
+Wraps the terraform product from hashicorp with segmented production and staging environments.
 
 
 Copyright (c) 2015 ChangeSprout Inc. See LICENSE for
