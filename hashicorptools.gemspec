@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Nathan Woodhull"]
-  s.date = "2017-05-15"
+  s.date = "2017-05-16"
   s.description = "Wrappers for terraform and packer"
   s.email = "systems@controlshiftlabs.com"
   s.executables = ["ec2_host"]
@@ -46,7 +46,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://github.com/woodhull/hashicorptools"
   s.licenses = ["MIT"]
-  s.rubygems_version = "2.6.8"
+  s.rubygems_version = "2.4.8"
   s.summary = "Wrappers for terraform and packer"
 
   if s.respond_to? :specification_version then
