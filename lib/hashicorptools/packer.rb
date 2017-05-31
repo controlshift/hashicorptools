@@ -103,12 +103,7 @@ module Hashicorptools
     end
 
     def ami_config_path
-      # FIXME: Gem.datadir doesn't seem to work properly when bundler is pointed at local source.
-      # Also, this bug: https://github.com/rubygems/rubygems/issues/1673
-      #datadir_path = "/home/jacinda/code/hashicorptools/data"
-      datadir_path = Gem.datadir('hashicorptools').gsub(/\/hashicorptools$/, '')  # workaround for bug in Gem.datadir
-
-      File.join(datadir_path, 'standard-ami.json')
+      File.expand_path('../ami_configs/standard-ami.json', __FILE__)
     end
 
     def region
