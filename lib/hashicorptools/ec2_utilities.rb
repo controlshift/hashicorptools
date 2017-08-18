@@ -5,7 +5,7 @@ module Hashicorptools
     end
 
     def amis(tag = tag_name)
-      sort_by_created_at(  ec2.images.with_owner('self').tagged(tag).to_a, tag )
+      sort_by_created_at(  ec2.images.with_owner('self').tagged(tag).to_a )
     end
 
     def ec2
@@ -30,16 +30,8 @@ module Hashicorptools
       igs.first
     end
 
-    def image_created_at(image, tag= tag_name)
-      if image
-        image.tags.to_h[tag].to_i
-      else
-        0
-      end
-    end
-
-    def sort_by_created_at(collection, tag = tag_name)
-      collection.sort{|a, b| self.image_created_at(b, tag) <=> self.image_created_at(a, tag) }
+    def sort_by_created_at(collection)
+      collection.sort{|a, b| b.creation_date.to_i <=> a.creation_date.to_i  }
     end
   end
 end
