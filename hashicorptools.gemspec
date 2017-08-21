@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Nathan Woodhull"]
-  s.date = "2017-05-16"
+  s.date = "2017-08-21"
   s.description = "Wrappers for terraform and packer"
   s.email = "systems@controlshiftlabs.com"
   s.executables = ["ec2_host"]
@@ -30,9 +30,9 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/ec2_host",
-    "data/standard-ami.json",
     "hashicorptools.gemspec",
     "lib/hashicorptools.rb",
+    "lib/hashicorptools/ami_configs/standard-ami.json",
     "lib/hashicorptools/auto_scaling_group.rb",
     "lib/hashicorptools/code_deploy.rb",
     "lib/hashicorptools/ec2_utilities.rb",
@@ -61,19 +61,6 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_runtime_dependency(%q<byebug>, [">= 0"])
       s.add_runtime_dependency(%q<git>, [">= 0"])
-      s.add_runtime_dependency(%q<rspec>, [">= 0"])
-      s.add_runtime_dependency(%q<rdoc>, ["~> 3.12"])
-      s.add_runtime_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_runtime_dependency(%q<juwelier>, [">= 0"])
-      s.add_runtime_dependency(%q<simplecov>, [">= 0"])
-      s.add_development_dependency(%q<aws-sdk>, ["~> 2"])
-      s.add_development_dependency(%q<dynect_rest>, [">= 0"])
-      s.add_development_dependency(%q<aws-sdk-v1>, [">= 0"])
-      s.add_development_dependency(%q<dotenv>, [">= 0"])
-      s.add_development_dependency(%q<thor>, [">= 0"])
-      s.add_development_dependency(%q<activesupport>, [">= 0"])
-      s.add_development_dependency(%q<byebug>, [">= 0"])
-      s.add_development_dependency(%q<git>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
@@ -93,34 +80,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<bundler>, ["~> 1.0"])
       s.add_dependency(%q<juwelier>, [">= 0"])
       s.add_dependency(%q<simplecov>, [">= 0"])
-      s.add_dependency(%q<aws-sdk>, ["~> 2"])
-      s.add_dependency(%q<dynect_rest>, [">= 0"])
-      s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
-      s.add_dependency(%q<dotenv>, [">= 0"])
-      s.add_dependency(%q<thor>, [">= 0"])
-      s.add_dependency(%q<activesupport>, [">= 0"])
-      s.add_dependency(%q<byebug>, [">= 0"])
-      s.add_dependency(%q<git>, [">= 0"])
-      s.add_dependency(%q<rspec>, [">= 0"])
-      s.add_dependency(%q<rdoc>, ["~> 3.12"])
-      s.add_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_dependency(%q<juwelier>, [">= 0"])
-      s.add_dependency(%q<simplecov>, [">= 0"])
     end
   else
-    s.add_dependency(%q<aws-sdk>, ["~> 2"])
-    s.add_dependency(%q<dynect_rest>, [">= 0"])
-    s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
-    s.add_dependency(%q<dotenv>, [">= 0"])
-    s.add_dependency(%q<thor>, [">= 0"])
-    s.add_dependency(%q<activesupport>, [">= 0"])
-    s.add_dependency(%q<byebug>, [">= 0"])
-    s.add_dependency(%q<git>, [">= 0"])
-    s.add_dependency(%q<rspec>, [">= 0"])
-    s.add_dependency(%q<rdoc>, ["~> 3.12"])
-    s.add_dependency(%q<bundler>, ["~> 1.0"])
-    s.add_dependency(%q<juwelier>, [">= 0"])
-    s.add_dependency(%q<simplecov>, [">= 0"])
     s.add_dependency(%q<aws-sdk>, ["~> 2"])
     s.add_dependency(%q<dynect_rest>, [">= 0"])
     s.add_dependency(%q<aws-sdk-v1>, [">= 0"])
