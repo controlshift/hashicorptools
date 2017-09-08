@@ -5,6 +5,10 @@ module Hashicorptools
     include Ec2Utilities
     include Variables
 
+    def self.exit_on_failure?
+      true
+    end
+
     desc "build", "creates an AMI from the current config"
     option :debug, :required => false
     def build
@@ -76,11 +80,11 @@ module Hashicorptools
         puts "[DEBUG] Executing 'packer build -debug #{variables(settings_overrides)} #{ami_config_path}'"
         system "packer build -debug \
           #{variables(settings_overrides)} \
-          #{ami_config_path}" or exit(false)
+          #{ami_config_path}" or exit(1)
       else
         system "packer build \
           #{variables(settings_overrides)} \
-          #{ami_config_path}" or exit(false)
+          #{ami_config_path}" or exit(1)
       end
 
       clean_amis
