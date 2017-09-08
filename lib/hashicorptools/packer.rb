@@ -76,11 +76,11 @@ module Hashicorptools
         puts "[DEBUG] Executing 'packer build -debug #{variables(settings_overrides)} #{ami_config_path}'"
         system "packer build -debug \
           #{variables(settings_overrides)} \
-          #{ami_config_path}"
+          #{ami_config_path}" or exit(false)
       else
         system "packer build \
           #{variables(settings_overrides)} \
-          #{ami_config_path}"
+          #{ami_config_path}" or exit(false)
       end
 
       clean_amis
