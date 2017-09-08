@@ -39,9 +39,7 @@
       "type": "chef-solo",
       "cookbook_paths": ["cookbooks", "site-cookbooks"],
       "run_list": ["{{user `cookbook_name`}}"],
-      "skip_install": true,
-      "data_bags_path": "data_bags",
-      "encrypted_data_bag_secret_path": "/etc/chef/encrypted_data_bag_secret"
+      "skip_install": true
     }
   ]
 }
