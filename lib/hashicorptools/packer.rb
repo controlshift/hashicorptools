@@ -74,7 +74,7 @@ module Hashicorptools
     protected
 
     def _build(settings_overrides={})
-      settings_overrides.merge!({source_ami: source_ami_id, ami_tag: tag_name, cookbook_name: cookbook_name})
+      settings_overrides.merge!({source_ami: source_ami_id, vpc_id: ami_building_vpc_id, subnet_id: ami_building_subnet_id, ami_tag: tag_name, cookbook_name: cookbook_name})
 
       if options[:debug]
         puts "[DEBUG] Executing 'packer build -debug #{variables(settings_overrides)} #{ami_config_path}'"
@@ -92,6 +92,14 @@ module Hashicorptools
 
     def source_ami_id
       current_ami('base-image').image_id
+    end
+
+    def ami_building_vpc_id
+      vpc_with_name('ami-building').vpc_id
+    end
+
+    def ami_building_subnet_id
+      ec2.client.describe_subnets({filters: [{name: "vpc-id", values: [ami_building_vpc_id]}]}).subnet_set.first.subnet_id
     end
 
     def format_variable(key, value)
