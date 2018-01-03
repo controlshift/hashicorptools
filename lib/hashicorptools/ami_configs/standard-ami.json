@@ -18,7 +18,7 @@
       "subnet_id": "{{user `subnet_id`}}",
       "region": "us-east-1",
       "source_ami": "{{user `source_ami`}}",
-      "instance_type": "c4.large",
+      "instance_type": "c5.large",
       "ssh_username": "ubuntu",
       "associate_public_ip_address": true,
       "ssh_private_ip": false,
