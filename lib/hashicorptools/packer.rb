@@ -20,6 +20,10 @@ module Hashicorptools
       system "packer validate #{ami_config_path}"
     end
 
+    desc "fix", "runs the packer fix cmd"
+      system "packer fix #{ami_config_path}"
+    end
+
     desc "console", "interactive session"
     def console
       require 'byebug'
