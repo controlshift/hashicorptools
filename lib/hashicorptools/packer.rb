@@ -21,6 +21,7 @@ module Hashicorptools
     end
 
     desc "fix", "runs the packer fix cmd"
+    def fix
       system "packer fix #{ami_config_path}"
     end
 
