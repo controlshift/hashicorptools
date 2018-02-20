@@ -1,51 +1,59 @@
 {
-  "variables": {
-    "aws_access_key": "",
-    "aws_secret_key": "",
-    "source_ami": "",
-    "vpc_id": "",
-    "subnet_id": "",
-    "ami_tag": "",
-    "cookbook_name": ""
-  },
-
   "builders": [
     {
-      "type": "amazon-ebs",
       "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
-      "vpc_id": "{{user `vpc_id`}}",
-      "subnet_id": "{{user `subnet_id`}}",
-      "region": "us-east-1",
-      "source_ami": "{{user `source_ami`}}",
-      "instance_type": "c5.large",
-      "ssh_username": "ubuntu",
-      "associate_public_ip_address": true,
-      "ssh_private_ip": false,
       "ami_name": "{{user `ami_tag`}} {{timestamp}}",
+      "associate_public_ip_address": true,
+      "ena_enabled": true,
+      "instance_type": "c5.large",
+      "launch_block_device_mappings": [
+        {
+          "delete_on_termination": true,
+          "device_name": "/dev/sda1",
+          "volume_size": 8,
+          "volume_type": "gp2"
+        }
+      ],
+      "region": "us-east-1",
+      "run_tags": {
+        "kind": "packer",
+        "role": "AMI builder"
+      },
+      "secret_key": "{{user `aws_secret_key`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "ssh_interface": "public_ip",
+      "ssh_username": "ubuntu",
+      "subnet_id": "{{user `subnet_id`}}",
       "tags": {
         "Name": "{{user `ami_tag`}}",
         "created_at": "{{isotime}}",
         "parent_ami": "{{user `source_ami`}}"
       },
-      "run_tags": {
-        "kind": "packer",
-        "role": "AMI builder"
-      },
-      "launch_block_device_mappings": [{
-        "device_name": "/dev/sda1",
-        "volume_size": 8,
-        "volume_type": "gp2",
-        "delete_on_termination": true
-      }]
+      "type": "amazon-ebs",
+      "vpc_id": "{{user `vpc_id`}}"
     }
   ],
+  "post-processors": [],
   "provisioners": [
     {
-      "type": "chef-solo",
-      "cookbook_paths": ["cookbooks", "site-cookbooks"],
-      "run_list": ["{{user `cookbook_name`}}"],
-      "skip_install": true
+      "cookbook_paths": [
+        "cookbooks",
+        "site-cookbooks"
+      ],
+      "run_list": [
+        "{{user `cookbook_name`}}"
+      ],
+      "skip_install": true,
+      "type": "chef-solo"
     }
-  ]
+  ],
+  "variables": {
+    "ami_tag": "",
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "cookbook_name": "",
+    "source_ami": "",
+    "subnet_id": "",
+    "vpc_id": ""
+  }
 }
