@@ -4,7 +4,7 @@
       "access_key": "{{user `aws_access_key`}}",
       "ami_name": "{{user `ami_tag`}} {{timestamp}}",
       "associate_public_ip_address": true,
-      "ena_enabled": true,
+      "ena_support": true,
       "instance_type": "c5.large",
       "launch_block_device_mappings": [
         {
