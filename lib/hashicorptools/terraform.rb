@@ -11,7 +11,7 @@ module Hashicorptools
       apply
     end
 
-    [:apply, :plan, :destroy, :pull, :refresh].each do |cmd|
+    [:apply, :plan, :destroy, :pull, :refresh, :init].each do |cmd|
       desc cmd, "terraform #{cmd}"
       option :environment, :required => true
       option :debug, :required => false
