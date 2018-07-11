@@ -11,7 +11,13 @@ module Hashicorptools
       apply
     end
 
-    [:apply, :plan, :destroy, :pull, :refresh, :init].each do |cmd|
+    desc 'init', 'install providers into local terraform'
+    option :environment, :required => true
+    def init
+
+    end
+
+    [:apply, :plan, :destroy, :pull, :refresh].each do |cmd|
       desc cmd, "terraform #{cmd}"
       option :environment, :required => true
       option :debug, :required => false
