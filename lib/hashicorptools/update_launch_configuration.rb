@@ -16,6 +16,8 @@ module Hashicorptools
 
         # then bring the instance count back down again.
         asg.set_desired_instances(current_count)
+
+        asg.verify_all_instances_using_correct_ami
       end
     end
   end
