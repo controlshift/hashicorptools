@@ -93,7 +93,8 @@ module Hashicorptools
       launch_configuration = Aws::AutoScaling::LaunchConfiguration.new(name: group.launch_configuration_name, client: autoscaling)
       image_id = launch_configuration.image_id
       group.instances.each do |i|
-        raise "#{i.instance_id} has the incorrect AMI, not #{image_id} from current LaunchConfig" if i.image_id != image_id
+        instance = Aws::EC2::Instance.new(i.instance_id, client: ec2)
+        raise "#{i.instance_id} has the incorrect AMI, not #{image_id} from current LaunchConfig" if instance.image_id != image_id
       end
     end
 
