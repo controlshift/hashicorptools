@@ -24,12 +24,13 @@ module Hashicorptools
       end
 
       puts "waiting for scaling events to finish"
-      groups.each do |group|
-        wait_for_activities_to_complete(group)
+      wait_for_activities_to_complete(group)
+      puts "all scaling activities finished."
+
+      if desired_instances > 0
+        wait_until_instances_ready
+        puts "all #{desired_instances} instances ready."
       end
-      puts "all #{desired_instances} scaling activities successful."
-      wait_until_instances_ready
-      puts "all #{desired_instances} instances ready."
     end
 
     def wait_until_instances_ready
