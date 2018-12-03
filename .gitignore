@@ -24,6 +24,7 @@ build/
 /.bundle/
 /vendor/bundle
 /lib/bundler/man/
+Gemfile.lock
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
