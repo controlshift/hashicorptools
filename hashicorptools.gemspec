@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Nathan Woodhull".freeze]
-  s.date = "2018-07-20"
+  s.date = "2018-12-03"
   s.description = "Wrappers for terraform and packer".freeze
   s.email = "systems@controlshiftlabs.com".freeze
   s.executables = ["ec2_host".freeze]
@@ -24,7 +24,6 @@ Gem::Specification.new do |s|
     ".ruby-version",
     ".travis.yml",
     "Gemfile",
-    "Gemfile.lock",
     "LICENSE",
     "README.md",
     "Rakefile",
@@ -54,46 +53,46 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<aws-sdk>.freeze, ["~> 2"])
-      s.add_runtime_dependency(%q<dynect_rest>.freeze, [">= 0"])
-      s.add_runtime_dependency(%q<aws-sdk-v1>.freeze, [">= 0"])
-      s.add_runtime_dependency(%q<dotenv>.freeze, [">= 0"])
-      s.add_runtime_dependency(%q<thor>.freeze, [">= 0"])
-      s.add_runtime_dependency(%q<activesupport>.freeze, [">= 0"])
-      s.add_runtime_dependency(%q<byebug>.freeze, [">= 0"])
-      s.add_runtime_dependency(%q<git>.freeze, [">= 0"])
-      s.add_development_dependency(%q<rspec>.freeze, [">= 0"])
+      s.add_runtime_dependency(%q<dynect_rest>.freeze, ["= 0.4.6"])
+      s.add_runtime_dependency(%q<aws-sdk-v1>.freeze, ["~> 1.67"])
+      s.add_runtime_dependency(%q<dotenv>.freeze, [">= 2.2.1", "~> 2.2"])
+      s.add_runtime_dependency(%q<thor>.freeze, ["= 0.20.0"])
+      s.add_runtime_dependency(%q<activesupport>.freeze, [">= 5.1.4", "~> 5.1"])
+      s.add_runtime_dependency(%q<byebug>.freeze, [">= 10.0.2", "~> 10.0"])
+      s.add_runtime_dependency(%q<git>.freeze, ["~> 1.3"])
+      s.add_development_dependency(%q<rspec>.freeze, ["~> 3.7"])
       s.add_development_dependency(%q<rdoc>.freeze, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>.freeze, ["~> 1.0"])
-      s.add_development_dependency(%q<juwelier>.freeze, [">= 0"])
+      s.add_development_dependency(%q<juwelier>.freeze, [">= 2.4.7", "~> 2.4"])
       s.add_development_dependency(%q<simplecov>.freeze, [">= 0"])
     else
       s.add_dependency(%q<aws-sdk>.freeze, ["~> 2"])
-      s.add_dependency(%q<dynect_rest>.freeze, [">= 0"])
-      s.add_dependency(%q<aws-sdk-v1>.freeze, [">= 0"])
-      s.add_dependency(%q<dotenv>.freeze, [">= 0"])
-      s.add_dependency(%q<thor>.freeze, [">= 0"])
-      s.add_dependency(%q<activesupport>.freeze, [">= 0"])
-      s.add_dependency(%q<byebug>.freeze, [">= 0"])
-      s.add_dependency(%q<git>.freeze, [">= 0"])
-      s.add_dependency(%q<rspec>.freeze, [">= 0"])
+      s.add_dependency(%q<dynect_rest>.freeze, ["= 0.4.6"])
+      s.add_dependency(%q<aws-sdk-v1>.freeze, ["~> 1.67"])
+      s.add_dependency(%q<dotenv>.freeze, [">= 2.2.1", "~> 2.2"])
+      s.add_dependency(%q<thor>.freeze, ["= 0.20.0"])
+      s.add_dependency(%q<activesupport>.freeze, [">= 5.1.4", "~> 5.1"])
+      s.add_dependency(%q<byebug>.freeze, [">= 10.0.2", "~> 10.0"])
+      s.add_dependency(%q<git>.freeze, ["~> 1.3"])
+      s.add_dependency(%q<rspec>.freeze, ["~> 3.7"])
       s.add_dependency(%q<rdoc>.freeze, ["~> 3.12"])
       s.add_dependency(%q<bundler>.freeze, ["~> 1.0"])
-      s.add_dependency(%q<juwelier>.freeze, [">= 0"])
+      s.add_dependency(%q<juwelier>.freeze, [">= 2.4.7", "~> 2.4"])
       s.add_dependency(%q<simplecov>.freeze, [">= 0"])
     end
   else
     s.add_dependency(%q<aws-sdk>.freeze, ["~> 2"])
-    s.add_dependency(%q<dynect_rest>.freeze, [">= 0"])
-    s.add_dependency(%q<aws-sdk-v1>.freeze, [">= 0"])
-    s.add_dependency(%q<dotenv>.freeze, [">= 0"])
-    s.add_dependency(%q<thor>.freeze, [">= 0"])
-    s.add_dependency(%q<activesupport>.freeze, [">= 0"])
-    s.add_dependency(%q<byebug>.freeze, [">= 0"])
-    s.add_dependency(%q<git>.freeze, [">= 0"])
-    s.add_dependency(%q<rspec>.freeze, [">= 0"])
+    s.add_dependency(%q<dynect_rest>.freeze, ["= 0.4.6"])
+    s.add_dependency(%q<aws-sdk-v1>.freeze, ["~> 1.67"])
+    s.add_dependency(%q<dotenv>.freeze, [">= 2.2.1", "~> 2.2"])
+    s.add_dependency(%q<thor>.freeze, ["= 0.20.0"])
+    s.add_dependency(%q<activesupport>.freeze, [">= 5.1.4", "~> 5.1"])
+    s.add_dependency(%q<byebug>.freeze, [">= 10.0.2", "~> 10.0"])
+    s.add_dependency(%q<git>.freeze, ["~> 1.3"])
+    s.add_dependency(%q<rspec>.freeze, ["~> 3.7"])
     s.add_dependency(%q<rdoc>.freeze, ["~> 3.12"])
     s.add_dependency(%q<bundler>.freeze, ["~> 1.0"])
-    s.add_dependency(%q<juwelier>.freeze, [">= 0"])
+    s.add_dependency(%q<juwelier>.freeze, [">= 2.4.7", "~> 2.4"])
     s.add_dependency(%q<simplecov>.freeze, [">= 0"])
   end
 end
