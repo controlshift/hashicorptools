@@ -32,6 +32,8 @@ module Hashicorptools
     private
 
     def create_deployment(commit_id, commit_message = nil)
+      Dotenv.load
+
       client = Aws::CodeDeploy::Client.new
       response = client.create_deployment({
                                             application_name: application_name,
