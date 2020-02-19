@@ -15,6 +15,7 @@
         }
       ],
       "region": "us-east-1",
+      "ami_regions": ["us-east-1", "eu-central-1"],
       "run_tags": {
         "kind": "packer",
         "role": "AMI builder"
