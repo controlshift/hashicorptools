@@ -12,6 +12,7 @@ module Hashicorptools
     desc 'deploy', 'deploy latest code to environment'
     option :environment, :required => true
     option :branch, default: 'master'
+    option :aws_region, default: 'us-east-1'
     option :commit
     def deploy
       g = Git.open('..')
@@ -34,7 +35,7 @@ module Hashicorptools
     def create_deployment(commit_id, commit_message = nil)
       Dotenv.load
 
-      client = Aws::CodeDeploy::Client.new
+      client = Aws::CodeDeploy::Client.new(region: options[:aws_region])
       response = client.create_deployment({
                                             application_name: application_name,
                                             deployment_group_name: "#{application_name}-#{options[:environment]}",
@@ -48,7 +49,7 @@ module Hashicorptools
                                             description: (commit_message || "commit #{commit_id}").slice(0,99)
                                           })
       puts "created deployment #{response.deployment_id}"
-      puts "https://console.aws.amazon.com/codedeploy/home?region=#{ENV['AWS_REGION']}#/deployments/#{response.deployment_id}"
+      puts "https://console.aws.amazon.com/codedeploy/home?region=#{options[:aws_region]}#/deployments/#{response.deployment_id}"
     end
 
     def application_name
