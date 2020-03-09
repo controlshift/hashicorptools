@@ -2,7 +2,7 @@ require "timeout"
 
 module Hashicorptools
   class AutoScalingGroup
-    attr_accessor :name
+    attr_accessor :name, :region
 
     def initialize(attrs = {})
       attrs.each do |key,value|
@@ -115,15 +115,15 @@ module Hashicorptools
     end
 
     def autoscaling
-      @autoscaling ||= Aws::AutoScaling::Client.new(region: 'us-east-1')
+      @autoscaling ||= Aws::AutoScaling::Client.new(region: region)
     end
 
     def ec2
-      @ec2 ||= Aws::EC2::Client.new(region: 'us-east-1')
+      @ec2 ||= Aws::EC2::Client.new(region: region)
     end
 
     def elb
-      @elb ||= Aws::ElasticLoadBalancing::Client.new(region: 'us-east-1')
+      @elb ||= Aws::ElasticLoadBalancing::Client.new(region: region)
     end
 
     def groups
