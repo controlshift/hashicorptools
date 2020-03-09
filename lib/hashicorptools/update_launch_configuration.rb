@@ -1,8 +1,9 @@
 module Hashicorptools
   class UpdateLaunchConfiguration < Thor
     desc 'deploy ASG_NAME', 'recycle instances in the ASG with no downtime'
+    option :aws_region, default: 'us-east-1'
     def deploy(asg_name)
-      asg = AutoScalingGroup.new(name: asg_name)
+      asg = AutoScalingGroup.new(name: asg_name, region: options[:aws_region])
       if asg.group.nil?
         raise "could not find asg #{asg_name}"
       end
