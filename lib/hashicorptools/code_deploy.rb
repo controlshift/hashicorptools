@@ -11,11 +11,20 @@ module Hashicorptools
 
     desc 'deploy', 'deploy latest code to environment'
     option :environment, :required => true
-    option :branch, default: 'master'
+    option :branch
     option :aws_region, default: 'us-east-1'
     option :commit
     def deploy
       g = Git.open('..')
+
+      # TODO restore defaulting branch to the default branch (and remove below check)
+      # once all the repos have the same default branch name of `main`
+      # Currently, `agra` is using `master` while other apps are using `main`.
+      # and we are unable to detect what the default branch is
+      # via the git client here.
+      if options[:commit].nil? && options[:branch].nil?
+        raise 'You must supply either commit or branch to deploy'
+      end
 
       commit = if options[:commit].present?
                  g.gcommit(options[:commit])
