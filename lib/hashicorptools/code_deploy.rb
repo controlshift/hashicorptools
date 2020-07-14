@@ -72,10 +72,12 @@ module Hashicorptools
                  g.log.first
                end
 
+      puts "Deploying to environment #{options[:environment]} - regions: #{aws_regions.join(', ')}
+            commit: #{commit.sha}
+            message: #{commit.message}"
+
       aws_regions.each do |aws_region|
-        puts "deploying to environment #{options[:environment]} region #{aws_region},
-              commit: #{commit.sha}
-              #{commit.message}"
+        puts "Deploying for region #{aws_region}"
         region_deployment(aws_region).create_deployment(commit.sha, commit.message)
       end
     end
