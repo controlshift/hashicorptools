@@ -16,8 +16,6 @@ module Hashicorptools
     end
 
     def create_deployment(commit_id, commit_message)
-      Dotenv.load
-
       client = Aws::CodeDeploy::Client.new(region: aws_region)
       response = client.create_deployment({
                                             application_name: application_name,
@@ -50,9 +48,9 @@ module Hashicorptools
     AWS_REGION_US_EAST_1 = 'us-east-1'
 
     desc 'deploy', 'deploy latest code to environment'
-    option :environment, :required => true
+    option :environment, required: true
     option :branch
-    option :aws_regions, :type => :array
+    option :aws_regions, type: :array
     option :commit
     def deploy
       g = Git.open('..')
@@ -88,11 +86,14 @@ module Hashicorptools
         aws_regions_batch.each do |aws_region|
           thread = Thread.new{ region_deployment(aws_region).create_deployment(commit.sha, commit.message) }
           threads.push(thread)
+        end
+
+        threads.each_with_index do |thread, index|
           begin
             thread.join
           rescue Exception => e
             # Don't quit whole program on exception in thread, just print exception and exit thread
-            puts "[#{aws_region}] EXCEPTION: #{e}"
+            puts "[#{aws_regions[index]}] EXCEPTION: #{e}"
           end
         end
       end
