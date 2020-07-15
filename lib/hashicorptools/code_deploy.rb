@@ -31,14 +31,18 @@ module Hashicorptools
                                             },
                                             description: (commit_message || "commit #{commit_id}").slice(0,99)
                                           })
-      puts "created deployment #{response.deployment_id}"
-      puts "https://console.aws.amazon.com/codedeploy/home?region=#{aws_region}#/deployments/#{response.deployment_id}"
+      output "created deployment #{response.deployment_id}"
+      output "https://console.aws.amazon.com/codedeploy/home?region=#{aws_region}#/deployments/#{response.deployment_id}"
     end
 
     private
 
     def application_name
       raise "implement me"
+    end
+
+    def output(text)
+      puts "[#{aws_region}] #{text}"
     end
   end
 
@@ -76,9 +80,21 @@ module Hashicorptools
             commit: #{commit.sha}
             message: #{commit.message}"
 
-      aws_regions.each do |aws_region|
-        puts "Deploying for region #{aws_region}"
-        region_deployment(aws_region).create_deployment(commit.sha, commit.message)
+      puts "Deploying for regions: #{aws_regions}"
+
+      threads = []
+      aws_regions.each_slice(2) do |aws_regions_batch|
+        puts "Deploying for 2 regions: #{aws_regions_batch}"
+        aws_regions_batch.each do |aws_region|
+          thread = Thread.new{ region_deployment(aws_region).create_deployment(commit.sha, commit.message) }
+          threads.push(thread)
+          begin
+            thread.join
+          rescue Exception => e
+            # Don't quit whole program on exception in thread, just print exception and exit thread
+            puts "[#{aws_region}] EXCEPTION: #{e}"
+          end
+        end
       end
     end
 
