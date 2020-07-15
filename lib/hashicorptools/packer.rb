@@ -129,19 +129,19 @@ module Hashicorptools
       'us-east-1'
     end
 
-    def auto_scaling
-      @auto_scaling ||= Aws::AutoScaling::Client.new(region: region)
+    def auto_scaling(client_region=region)
+      @auto_scaling ||= Aws::AutoScaling::Client.new(region: client_region)
     end
 
-    def ec2_v2
-      @ec2 ||= Aws::EC2::Client.new(region: region)
+    def ec2_v2(client_region=region)
+      @ec2 ||= Aws::EC2::Client.new(region: client_region)
     end
 
-    def amis_in_use
-      launch_configs = auto_scaling.describe_launch_configurations
+    def amis_in_use(client_region)
+      launch_configs = auto_scaling(client_region).describe_launch_configurations
       image_ids = launch_configs.data['launch_configurations'].collect{|lc| lc.image_id}.flatten
 
-      ec2_reservations = ec2_v2.describe_instances
+      ec2_reservations = ec2_v2(client_region).describe_instances
       image_ids << ec2_reservations.reservations.collect{|res| res.instances.collect{|r| r.image_id}}.flatten
       image_ids.flatten
     end
@@ -158,7 +158,7 @@ module Hashicorptools
 
     def clean_amis_for_region(region_to_clean)
       ami_ids = amis_in_region(region_to_clean).collect{|a| a.image_id}
-      ami_ids_to_remove = ami_ids - amis_in_use
+      ami_ids_to_remove = ami_ids - amis_in_use(region_to_clean)
       potential_amis_to_remove = amis_in_region(region_to_clean)
       potential_amis_to_remove.keep_if {|a| ami_ids_to_remove.include?(a.image_id) }
 
