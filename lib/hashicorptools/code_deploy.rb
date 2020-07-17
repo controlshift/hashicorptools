@@ -58,19 +58,11 @@ module Hashicorptools
       # We set defaults (depending on environment) for aws_regions if not passed in
       aws_regions = options[:aws_regions] || default_regions
 
-      # TODO restore defaulting branch to the default branch (and remove below check)
-      # once all the repos have the same default branch name of `main`
-      # Currently, `agra` is using `master` while other apps are using `main`.
-      # and we are unable to detect what the default branch is
-      # via the git client here.
-      if options[:commit].nil? && options[:branch].nil?
-        raise 'You must supply either commit or branch to deploy'
-      end
-
       commit = if options[:commit].present?
                  g.gcommit(options[:commit])
                else
-                 g.checkout(options[:branch].to_sym)
+                 branch = options[:branch].nil? ? :main : options[:branch].to_sym
+                 g.checkout(branch)
                  g.log.first
                end
 
