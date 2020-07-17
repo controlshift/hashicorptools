@@ -33,7 +33,7 @@ module Hashicorptools
 
     desc "list", "list all available amis"
     def list
-      amis.each do |ami|
+      amis_in_region(region).each do |ami|
         puts ami.image_id
       end
     end
@@ -129,39 +129,49 @@ module Hashicorptools
       'us-east-1'
     end
 
-    def auto_scaling
-      @auto_scaling ||= Aws::AutoScaling::Client.new(region: region)
+    def auto_scaling(client_region=region)
+      @auto_scaling ||= Aws::AutoScaling::Client.new(region: client_region)
     end
 
-    def ec2_v2
-      @ec2 ||= Aws::EC2::Client.new(region: region)
+    def ec2_v2(client_region=region)
+      @ec2 ||= Aws::EC2::Client.new(region: client_region)
     end
 
-    def amis_in_use
-      launch_configs = auto_scaling.describe_launch_configurations
+    def amis_in_use(client_region)
+      launch_configs = auto_scaling(client_region).describe_launch_configurations
       image_ids = launch_configs.data['launch_configurations'].collect{|lc| lc.image_id}.flatten
 
-      ec2_reservations = ec2_v2.describe_instances
+      ec2_reservations = ec2_v2(client_region).describe_instances
       image_ids << ec2_reservations.reservations.collect{|res| res.instances.collect{|r| r.image_id}}.flatten
       image_ids.flatten
     end
 
+    def ami_regions
+      ['us-east-1', 'eu-central-1']
+    end
+
     def clean_amis
-      ami_ids = amis.collect{|a| a.image_id}
-      ami_ids_to_remove = ami_ids - amis_in_use
-      potential_amis_to_remove = amis
+      ami_regions.each do |ami_region|
+        clean_amis_for_region(ami_region)
+      end
+    end
+
+    def clean_amis_for_region(region_to_clean)
+      ami_ids = amis_in_region(region_to_clean).collect{|a| a.image_id}
+      ami_ids_to_remove = ami_ids - amis_in_use(region_to_clean)
+      potential_amis_to_remove = amis_in_region(region_to_clean)
       potential_amis_to_remove.keep_if {|a| ami_ids_to_remove.include?(a.image_id) }
 
       if potential_amis_to_remove.size > NUMBER_OF_AMIS_TO_KEEP
         amis_to_remove = potential_amis_to_remove[NUMBER_OF_AMIS_TO_KEEP..-1]
         amis_to_keep = potential_amis_to_remove[0..(NUMBER_OF_AMIS_TO_KEEP-1)]
 
-        puts "Deregistering old AMIs..."
+        puts "Deregistering old AMIs in #{region_to_clean}..."
         amis_to_remove.each do |ami|
           ebs_mappings = ami.block_device_mappings
           puts "Deregistering #{ami.image_id}"
           ami.deregister
-          delete_ami_snapshots(ebs_mappings)
+          delete_ami_snapshots(ebs_mappings, snapshot_region: region_to_clean)
         end
 
         puts "Currently active AMIs..."
@@ -169,15 +179,21 @@ module Hashicorptools
           puts ami.image_id
         end
       else
-        puts "no AMIs to clean."
+        puts "no AMIs to clean in #{region_to_clean}."
       end
     end
 
-    def delete_ami_snapshots(ebs_mappings)
+    def amis_in_region(ami_region)
+      regional_ec2_client = AWS::EC2.new(region: ami_region)
+
+      sort_by_created_at( regional_ec2_client.images.with_owner('self').with_tag('Name', tag_name).to_a )
+    end
+
+    def delete_ami_snapshots(ebs_mappings, snapshot_region:)
+      regional_ec2_client = AWS::EC2::Client.new(region: snapshot_region)
       ebs_mappings.each do |volume, attributes|
         puts "Deleting snapshot #{attributes[:snapshot_id]}"
-        snapshot = AWS::EC2::Snapshot.new(attributes[:snapshot_id])
-        snapshot.delete
+        regional_ec2_client.delete_snapshot(snapshot_id: attributes[:snapshot_id])
       end
     end
   end
