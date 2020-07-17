@@ -74,7 +74,7 @@ module Hashicorptools
 
       threads = []
       aws_regions.each_slice(2) do |aws_regions_batch|
-        puts "Deploying for 2 regions: #{aws_regions_batch}"
+        puts "Deploying for batch of regions: #{aws_regions_batch}"
         aws_regions_batch.each do |aws_region|
           thread = Thread.new{ region_deployment(aws_region).create_deployment(commit.sha, commit.message) }
           threads.push(thread)
