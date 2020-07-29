@@ -15,6 +15,6 @@ group :development do
   gem 'rspec', '> 3.7'
   gem 'rdoc', '> 3.12'
   gem 'bundler', '> 2.0'
-  gem 'juwelier', '> 2.4'
+  gem 'juwelier', git: 'https://github.com/flajann2/juwelier.git'
   gem 'simplecov', '>= 0'
 end
