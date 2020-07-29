@@ -61,7 +61,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rspec>.freeze, ["> 3.7"])
       s.add_development_dependency(%q<rdoc>.freeze, ["> 3.12"])
       s.add_development_dependency(%q<bundler>.freeze, ["> 2.0"])
-      s.add_development_dependency(%q<juwelier>.freeze, ["> 2.4"])
+      s.add_development_dependency(%q<juwelier>.freeze, [">= 0"])
       s.add_development_dependency(%q<simplecov>.freeze, [">= 0"])
     else
       s.add_dependency(%q<aws-sdk>.freeze, ["~> 2"])
@@ -74,7 +74,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rspec>.freeze, ["> 3.7"])
       s.add_dependency(%q<rdoc>.freeze, ["> 3.12"])
       s.add_dependency(%q<bundler>.freeze, ["> 2.0"])
-      s.add_dependency(%q<juwelier>.freeze, ["> 2.4"])
+      s.add_dependency(%q<juwelier>.freeze, [">= 0"])
       s.add_dependency(%q<simplecov>.freeze, [">= 0"])
     end
   else
@@ -88,7 +88,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rspec>.freeze, ["> 3.7"])
     s.add_dependency(%q<rdoc>.freeze, ["> 3.12"])
     s.add_dependency(%q<bundler>.freeze, ["> 2.0"])
-    s.add_dependency(%q<juwelier>.freeze, ["> 2.4"])
+    s.add_dependency(%q<juwelier>.freeze, [">= 0"])
     s.add_dependency(%q<simplecov>.freeze, [">= 0"])
   end
 end
