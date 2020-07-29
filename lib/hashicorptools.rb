@@ -4,7 +4,6 @@ require 'thor'
 require 'active_support/all'
 require 'aws-sdk-v1'
 require 'aws-sdk'
-require 'dynect_rest'
 
 module Hashicorptools
 end
