@@ -17,7 +17,7 @@ module Hashicorptools
               'us-east-1'
             end
 
-      @_ec2 = AWS::EC2.new(region: reg)
+      @_ec2 = Aws::EC2::Client.new(region: reg)
     end
 
     def vpc_with_name(name)
