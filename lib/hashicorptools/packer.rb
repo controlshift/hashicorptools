@@ -201,8 +201,10 @@ module Hashicorptools
       ec2_client = regional_ec2_client(snapshot_region)
 
       ebs_mappings.each do |ebs_mapping|
-        puts "Deleting snapshot #{ebs_mapping.ebs.snapshot_id}"
-        ec2_client.delete_snapshot({snapshot_id: ebs_mapping.ebs.snapshot_id})
+        unless ebs_mapping.ebs.nil?
+          puts "Deleting snapshot #{ebs_mapping.ebs.snapshot_id}"
+          ec2_client.delete_snapshot({snapshot_id: ebs_mapping.ebs.snapshot_id})
+        end
       end
     end
   end
