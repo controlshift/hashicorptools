@@ -56,8 +56,7 @@ module Hashicorptools
         ami_id = match[1]
         unless ec2.describe_images({image_ids: [ami_id]}).images.any?
           puts "Removing obsolete snapshot #{snapshot.id} - #{snapshot.description}"
-          snapshot = AWS::EC2::Snapshot.new(snapshot.id)
-          snapshot.delete
+          ec2.delete_snapshot({snapshot_id: snapshot.id})
         end
       end
     end
@@ -189,16 +188,19 @@ module Hashicorptools
     end
 
     def amis_in_region(ami_region)
-      regional_ec2_client = AWS::EC2.new(region: ami_region)
-
-      sort_by_created_at( regional_ec2_client.images.with_owner('self').with_tag('Name', tag_name).to_a )
+      images = regional_ec2_client(ami_region).describe_images({
+        owners: ['self'],
+        filters: [{name: 'tag:Name', values: [tag]}]
+      }).images
+      sort_by_created_at(images)
     end
 
     def delete_ami_snapshots(ebs_mappings, snapshot_region:)
-      regional_ec2_client = AWS::EC2::Client.new(region: snapshot_region)
+      ec2_client = regional_ec2_client(snapshot_region)
+
       ebs_mappings.each do |volume, attributes|
         puts "Deleting snapshot #{attributes[:snapshot_id]}"
-        regional_ec2_client.delete_snapshot(snapshot_id: attributes[:snapshot_id])
+        ec2_client.delete_snapshot({snapshot_id: attributes[:snapshot_id]})
       end
     end
   end
