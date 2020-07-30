@@ -1,3 +1,6 @@
+require 'aws-sdk-autoscaling'
+require 'aws-sdk-ec2'
+
 module Hashicorptools
   NUMBER_OF_AMIS_TO_KEEP = 2
 
