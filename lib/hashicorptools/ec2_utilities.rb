@@ -5,7 +5,8 @@ module Hashicorptools
     end
 
     def amis(tag = tag_name)
-      sort_by_created_at(  ec2.images.with_owner('self').with_tag('Name', tag).to_a )
+      images = ec2.describe_images({owners: ['self'], filters: [{name: 'tag:Name', values: [tag]}]}).images
+      sort_by_created_at(images)
     end
 
     def ec2
@@ -21,13 +22,11 @@ module Hashicorptools
     end
 
     def vpc_with_name(name)
-      vpcs = ec2.client.describe_vpcs({filters: [{name: 'tag:Name', values: [name]}]}).vpc_set
-      vpcs.first
+      ec2.describe_vpcs({filters: [{name: 'tag:Name', values: [name]}]}).vpcs.first
     end
 
     def internet_gateway_for_vpc(vpc_id)
-      igs = ec2.client.describe_internet_gateways({filters: [{name: 'attachment.vpc-id', values: [vpc_id]}]}).internet_gateway_set
-      igs.first
+      ec2.describe_internet_gateways({filters: [{name: 'attachment.vpc-id', values: [vpc_id]}]}).internet_gateways.first
     end
 
     def sort_by_created_at(collection)
