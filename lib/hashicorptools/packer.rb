@@ -45,7 +45,7 @@ module Hashicorptools
 
     desc "clean_snapshots", "clean obsolete EBS snapshots not associated with any AMI"
     def clean_snapshots
-      snapshots = ec2.snapshots.with_owner('self')
+      snapshots = ec2.describe_snapshots({owner_ids: ['self']}).snapshots
       snapshots.each do |snapshot|
         match = snapshot.description.match(/Created by CreateImage\(.+\) for (ami-[0-9a-f]+) from vol-.+/)
         if match.nil?
@@ -54,25 +54,28 @@ module Hashicorptools
         end
 
         ami_id = match[1]
-        unless ec2.images[ami_id].exists?
-          puts "Removing obsolete snapshot #{snapshot.id} - #{snapshot.description}"
-          snapshot = AWS::EC2::Snapshot.new(snapshot.id)
-          snapshot.delete
+        unless Aws::EC2::Image.new(ami_id, region: region).exists?
+          puts "Removing obsolete snapshot #{snapshot.snapshot_id} - #{snapshot.description}"
+          ec2.delete_snapshot({snapshot_id: snapshot.snapshot_id})
         end
       end
     end
 
     desc "boot", "start up an instance of the latest version of AMI"
     def boot
-      run_instances_resp = ec2.run_instances(image_id: current_ami('base-image').image_id,
+      run_instances_resp = ec2.run_instances({
+        image_id: current_ami('base-image').image_id,
         min_count: 1,
         max_count: 1,
-        instance_type: "t2.micro")
+        instance_type: "t2.micro"
+      })
 
-      ec2.create_tags( resources: run_instances_resp.instances.collect(&:instance_id),
-          tags: [ {key: 'Name', value: "packer test boot #{tag_name}"},
-                  {key: 'environment', value: 'packer-development'},
-                  {key: 'temporary', value: 'kill me'}])
+      ec2.create_tags({
+        resources: run_instances_resp.instances.collect(&:instance_id),
+        tags: [ {key: 'Name', value: "packer test boot #{tag_name}"},
+                {key: 'environment', value: 'packer-development'},
+                {key: 'temporary', value: 'kill me'}]
+      })
 
       require 'byebug'
       byebug
@@ -106,7 +109,7 @@ module Hashicorptools
     end
 
     def ami_building_subnet_id
-      ec2.client.describe_subnets({filters: [{name: "vpc-id", values: [ami_building_vpc_id]}]}).subnet_set.first.subnet_id
+      ec2.describe_subnets({filters: [{name: "vpc-id", values: [ami_building_vpc_id]}]}).subnets.first.subnet_id
     end
 
     def format_variable(key, value)
@@ -133,15 +136,16 @@ module Hashicorptools
       @auto_scaling ||= Aws::AutoScaling::Client.new(region: client_region)
     end
 
-    def ec2_v2(client_region=region)
-      @ec2 ||= Aws::EC2::Client.new(region: client_region)
+    def regional_ec2_client(client_region=region)
+      @_regional_ec2_clients = {} if @_regional_ec2_clients.nil?
+      @_regional_ec2_clients[client_region] ||= Aws::EC2::Client.new(region: client_region)
     end
 
     def amis_in_use(client_region)
       launch_configs = auto_scaling(client_region).describe_launch_configurations
       image_ids = launch_configs.data['launch_configurations'].collect{|lc| lc.image_id}.flatten
 
-      ec2_reservations = ec2_v2(client_region).describe_instances
+      ec2_reservations = regional_ec2_client(client_region).describe_instances
       image_ids << ec2_reservations.reservations.collect{|res| res.instances.collect{|r| r.image_id}}.flatten
       image_ids.flatten
     end
@@ -170,7 +174,9 @@ module Hashicorptools
         amis_to_remove.each do |ami|
           ebs_mappings = ami.block_device_mappings
           puts "Deregistering #{ami.image_id}"
-          ami.deregister
+          regional_ec2_client(region_to_clean).deregister_image({
+            image_id: ami.image_id
+          })
           delete_ami_snapshots(ebs_mappings, snapshot_region: region_to_clean)
         end
 
@@ -184,16 +190,21 @@ module Hashicorptools
     end
 
     def amis_in_region(ami_region)
-      regional_ec2_client = AWS::EC2.new(region: ami_region)
-
-      sort_by_created_at( regional_ec2_client.images.with_owner('self').with_tag('Name', tag_name).to_a )
+      images = regional_ec2_client(ami_region).describe_images({
+        owners: ['self'],
+        filters: [{name: 'tag:Name', values: [tag_name]}]
+      }).images
+      sort_by_created_at(images)
     end
 
     def delete_ami_snapshots(ebs_mappings, snapshot_region:)
-      regional_ec2_client = AWS::EC2::Client.new(region: snapshot_region)
-      ebs_mappings.each do |volume, attributes|
-        puts "Deleting snapshot #{attributes[:snapshot_id]}"
-        regional_ec2_client.delete_snapshot(snapshot_id: attributes[:snapshot_id])
+      ec2_client = regional_ec2_client(snapshot_region)
+
+      ebs_mappings.each do |ebs_mapping|
+        unless ebs_mapping.ebs.nil?
+          puts "Deleting snapshot #{ebs_mapping.ebs.snapshot_id}"
+          ec2_client.delete_snapshot({snapshot_id: ebs_mapping.ebs.snapshot_id})
+        end
       end
     end
   end

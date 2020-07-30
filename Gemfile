@@ -1,10 +1,6 @@
 source "http://rubygems.org"
 
-# try to slowly migrate to v2 of the aws api
 gem 'aws-sdk', '~> 2'
-
-# this is somewhat undesirable but lets us update json gem version. We should really replace the old v1 code.
-gem 'aws-sdk-v1-ruby24', git: 'https://github.com/seielit/aws-sdk-v1-ruby24.git', branch: 'aws-sdk-v1-ruby24'
 gem 'dotenv', '~> 2.2', '>= 2.2.1'
 gem 'thor', '>= 0.20.0'
 gem 'activesupport', '>= 5.1.4'
