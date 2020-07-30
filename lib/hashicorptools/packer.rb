@@ -174,7 +174,9 @@ module Hashicorptools
         amis_to_remove.each do |ami|
           ebs_mappings = ami.block_device_mappings
           puts "Deregistering #{ami.image_id}"
-          ami.deregister
+          regional_ec2_client(region_to_clean).deregister_image({
+            image_id: ami.image_id
+          })
           delete_ami_snapshots(ebs_mappings, snapshot_region: region_to_clean)
         end
 
@@ -190,7 +192,7 @@ module Hashicorptools
     def amis_in_region(ami_region)
       images = regional_ec2_client(ami_region).describe_images({
         owners: ['self'],
-        filters: [{name: 'tag:Name', values: [tag]}]
+        filters: [{name: 'tag:Name', values: [tag_name]}]
       }).images
       sort_by_created_at(images)
     end
@@ -198,9 +200,9 @@ module Hashicorptools
     def delete_ami_snapshots(ebs_mappings, snapshot_region:)
       ec2_client = regional_ec2_client(snapshot_region)
 
-      ebs_mappings.each do |volume, attributes|
-        puts "Deleting snapshot #{attributes[:snapshot_id]}"
-        ec2_client.delete_snapshot({snapshot_id: attributes[:snapshot_id]})
+      ebs_mappings.each do |ebs_mapping|
+        puts "Deleting snapshot #{ebs_mapping.ebs.snapshot_id}"
+        ec2_client.delete_snapshot({snapshot_id: ebs_mapping.ebs.snapshot_id})
       end
     end
   end
