@@ -1,3 +1,5 @@
+require 'aws-sdk-ec2'
+
 module Hashicorptools
   module Ec2Utilities
     def current_ami(tag = tag_name)

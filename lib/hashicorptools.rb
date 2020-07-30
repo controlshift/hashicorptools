@@ -2,7 +2,6 @@ require 'bundler/setup'
 require 'dotenv'
 require 'thor'
 require 'active_support/all'
-require 'aws-sdk'
 
 module Hashicorptools
 end

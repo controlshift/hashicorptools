@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'aws-sdk'
+require 'aws-sdk-codedeploy'
 require 'dotenv'
 require 'git'
 require 'logger'

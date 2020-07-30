@@ -1,6 +1,10 @@
 source "http://rubygems.org"
 
-gem 'aws-sdk', '~> 2'
+gem 'aws-sdk-autoscaling', '~> 1'
+gem 'aws-sdk-codedeploy', '~> 1'
+gem 'aws-sdk-ec2', '~> 1'
+gem 'aws-sdk-elasticloadbalancing', '~> 1'
+
 gem 'dotenv', '~> 2.2', '>= 2.2.1'
 gem 'thor', '>= 0.20.0'
 gem 'activesupport', '>= 5.1.4'

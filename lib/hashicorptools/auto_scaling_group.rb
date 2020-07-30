@@ -1,4 +1,7 @@
 require "timeout"
+require 'aws-sdk-autoscaling'
+require 'aws-sdk-ec2'
+require 'aws-sdk-elasticloadbalancing'
 
 module Hashicorptools
   class AutoScalingGroup

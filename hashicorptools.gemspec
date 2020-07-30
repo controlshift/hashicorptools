@@ -52,7 +52,10 @@ Gem::Specification.new do |s|
   end
 
   if s.respond_to? :add_runtime_dependency then
-    s.add_runtime_dependency(%q<aws-sdk>.freeze, ["~> 2"])
+    s.add_runtime_dependency(%q<aws-sdk-autoscaling>.freeze, ["~> 1"])
+    s.add_runtime_dependency(%q<aws-sdk-codedeploy>.freeze, ["~> 1"])
+    s.add_runtime_dependency(%q<aws-sdk-ec2>.freeze, ["~> 1"])
+    s.add_runtime_dependency(%q<aws-sdk-elasticloadbalancing>.freeze, ["~> 1"])
     s.add_runtime_dependency(%q<dotenv>.freeze, ["~> 2.2", ">= 2.2.1"])
     s.add_runtime_dependency(%q<thor>.freeze, [">= 0.20.0"])
     s.add_runtime_dependency(%q<activesupport>.freeze, [">= 5.1.4"])
@@ -64,7 +67,10 @@ Gem::Specification.new do |s|
     s.add_development_dependency(%q<juwelier>.freeze, [">= 0"])
     s.add_development_dependency(%q<simplecov>.freeze, [">= 0"])
   else
-    s.add_dependency(%q<aws-sdk>.freeze, ["~> 2"])
+    s.add_dependency(%q<aws-sdk-autoscaling>.freeze, ["~> 1"])
+    s.add_dependency(%q<aws-sdk-codedeploy>.freeze, ["~> 1"])
+    s.add_dependency(%q<aws-sdk-ec2>.freeze, ["~> 1"])
+    s.add_dependency(%q<aws-sdk-elasticloadbalancing>.freeze, ["~> 1"])
     s.add_dependency(%q<dotenv>.freeze, ["~> 2.2", ">= 2.2.1"])
     s.add_dependency(%q<thor>.freeze, [">= 0.20.0"])
     s.add_dependency(%q<activesupport>.freeze, [">= 5.1.4"])
