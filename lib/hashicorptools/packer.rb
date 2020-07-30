@@ -137,15 +137,16 @@ module Hashicorptools
       @auto_scaling ||= Aws::AutoScaling::Client.new(region: client_region)
     end
 
-    def ec2_v2(client_region=region)
-      @ec2 ||= Aws::EC2::Client.new(region: client_region)
+    def regional_ec2_client(client_region=region)
+      @_regional_ec2_clients = {} if @_regional_ec2_clients.nil?
+      @_regional_ec2_clients[client_region] ||= Aws::EC2::Client.new(region: client_region)
     end
 
     def amis_in_use(client_region)
       launch_configs = auto_scaling(client_region).describe_launch_configurations
       image_ids = launch_configs.data['launch_configurations'].collect{|lc| lc.image_id}.flatten
 
-      ec2_reservations = ec2_v2(client_region).describe_instances
+      ec2_reservations = regional_ec2_client(client_region).describe_instances
       image_ids << ec2_reservations.reservations.collect{|res| res.instances.collect{|r| r.image_id}}.flatten
       image_ids.flatten
     end
