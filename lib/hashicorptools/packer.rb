@@ -54,9 +54,9 @@ module Hashicorptools
         end
 
         ami_id = match[1]
-        unless ec2.describe_images({image_ids: [ami_id]}).images.any?
-          puts "Removing obsolete snapshot #{snapshot.id} - #{snapshot.description}"
-          ec2.delete_snapshot({snapshot_id: snapshot.id})
+        unless Aws::EC2::Image.new(ami_id, region: region).exists?
+          puts "Removing obsolete snapshot #{snapshot.snapshot_id} - #{snapshot.description}"
+          ec2.delete_snapshot({snapshot_id: snapshot.snapshot_id})
         end
       end
     end
