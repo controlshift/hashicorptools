@@ -45,7 +45,7 @@ module Hashicorptools
 
     desc "clean_snapshots", "clean obsolete EBS snapshots not associated with any AMI"
     def clean_snapshots
-      snapshots = ec2.snapshots.with_owner('self')
+      snapshots = ec2.describe_snapshots({owner_ids: ['self']}).snapshots
       snapshots.each do |snapshot|
         match = snapshot.description.match(/Created by CreateImage\(.+\) for (ami-[0-9a-f]+) from vol-.+/)
         if match.nil?
@@ -54,7 +54,7 @@ module Hashicorptools
         end
 
         ami_id = match[1]
-        unless ec2.images[ami_id].exists?
+        unless ec2.describe_images({image_ids: [ami_id]}).images.any?
           puts "Removing obsolete snapshot #{snapshot.id} - #{snapshot.description}"
           snapshot = AWS::EC2::Snapshot.new(snapshot.id)
           snapshot.delete
@@ -64,15 +64,19 @@ module Hashicorptools
 
     desc "boot", "start up an instance of the latest version of AMI"
     def boot
-      run_instances_resp = ec2.run_instances(image_id: current_ami('base-image').image_id,
+      run_instances_resp = ec2.run_instances({
+        image_id: current_ami('base-image').image_id,
         min_count: 1,
         max_count: 1,
-        instance_type: "t2.micro")
+        instance_type: "t2.micro"
+      })
 
-      ec2.create_tags( resources: run_instances_resp.instances.collect(&:instance_id),
-          tags: [ {key: 'Name', value: "packer test boot #{tag_name}"},
-                  {key: 'environment', value: 'packer-development'},
-                  {key: 'temporary', value: 'kill me'}])
+      ec2.create_tags({
+        resources: run_instances_resp.instances.collect(&:instance_id),
+        tags: [ {key: 'Name', value: "packer test boot #{tag_name}"},
+                {key: 'environment', value: 'packer-development'},
+                {key: 'temporary', value: 'kill me'}]
+      })
 
       require 'byebug'
       byebug
@@ -106,7 +110,7 @@ module Hashicorptools
     end
 
     def ami_building_subnet_id
-      ec2.client.describe_subnets({filters: [{name: "vpc-id", values: [ami_building_vpc_id]}]}).subnet_set.first.subnet_id
+      ec2.describe_subnets({filters: [{name: "vpc-id", values: [ami_building_vpc_id]}]}).subnets.first.subnet_id
     end
 
     def format_variable(key, value)
