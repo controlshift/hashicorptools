@@ -94,11 +94,13 @@ module Hashicorptools
     end
 
     def verify_all_instances_using_correct_ami
-      launch_configuration = Aws::AutoScaling::LaunchConfiguration.new(name: group.launch_configuration_name, client: autoscaling)
-      image_id = launch_configuration.image_id
-      group.instances.each do |i|
-        instance = Aws::EC2::Instance.new(i.instance_id, client: ec2)
-        raise "#{i.instance_id} has the incorrect AMI, not #{image_id} from current LaunchConfig" if instance.image_id != image_id
+      if group.launch_configuration_name
+        launch_configuration = Aws::AutoScaling::LaunchConfiguration.new(name: group.launch_configuration_name, client: autoscaling)
+        image_id = launch_configuration.image_id
+        group.instances.each do |i|
+          instance = Aws::EC2::Instance.new(i.instance_id, client: ec2)
+          raise "#{i.instance_id} has the incorrect AMI, not #{image_id} from current LaunchConfig" if instance.image_id != image_id
+        end
       end
     end
 
