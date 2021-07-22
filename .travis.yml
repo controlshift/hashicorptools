@@ -1,7 +1,0 @@
-language: ruby
-rvm:
-  - "2.7.3"
-# TravisCI uses Bundler 1 by default, but we want Bundler 2
-# https://docs.travis-ci.com/user/languages/ruby/#bundler-20
-before_install:
-  - gem install bundler
