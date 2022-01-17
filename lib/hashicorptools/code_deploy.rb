@@ -72,9 +72,11 @@ module Hashicorptools
 
       puts "Deploying for regions: #{aws_regions}"
 
-      threads = []
+      all_succeeded = true
       aws_regions.each_slice(2) do |aws_regions_batch|
         puts "Deploying for batch of regions: #{aws_regions_batch}"
+
+        threads = []
         aws_regions_batch.each do |aws_region|
           thread = Thread.new{ region_deployment(aws_region).create_deployment(commit.sha, commit.message) }
           threads.push(thread)
@@ -82,13 +84,18 @@ module Hashicorptools
 
         threads.each_with_index do |thread, index|
           begin
-            thread.join
+            # thread.value waits for the thread to finish with #join, then returns the value of the expression
+            thread_succeeded = thread.value
+            all_succeeded = all_succeeded && thread_succeeded
           rescue Exception => e
             # Don't quit whole program on exception in thread, just print exception and exit thread
             puts "[#{aws_regions[index]}] EXCEPTION: #{e}"
           end
         end
       end
+
+      # Return a success or failure status code to be consumed by bash
+      exit(all_succeeded)
     end
 
     private
