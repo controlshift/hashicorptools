@@ -90,9 +90,10 @@ module Hashicorptools
             # thread.value waits for the thread to finish with #join, then returns the value of the expression
             thread_succeeded = thread.value
             all_succeeded = all_succeeded && thread_succeeded
-          rescue Exception => e
+          rescue StandardError => e
             # Don't quit whole program on exception in thread, just print exception and exit thread
             puts "[#{aws_regions[index]}] EXCEPTION: #{e}"
+            all_succeeded = false
           end
         end
       end
