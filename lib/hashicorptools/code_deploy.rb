@@ -31,6 +31,9 @@ module Hashicorptools
                                           })
       output "created deployment #{response.deployment_id}"
       output "https://console.aws.amazon.com/codedeploy/home?region=#{aws_region}#/deployments/#{response.deployment_id}"
+
+      # Classes that override this method should return true for a successful deployment, false otherwise
+      return true
     end
 
     private
