@@ -15,12 +15,12 @@ require 'juwelier'
 Juwelier::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
   gem.name = "hashicorptools"
-  gem.homepage = "http://github.com/woodhull/hashicorptools"
+  gem.homepage = "http://github.com/controlshift/hashicorptools"
   gem.license = "MIT"
   gem.summary = %Q{Wrappers for terraform and packer}
   gem.description = %Q{Wrappers for terraform and packer}
   gem.email = "systems@controlshiftlabs.com"
-  gem.authors = ["Nathan Woodhull"]
+  gem.authors = ['Kathy Lu', 'Diego Marcet', 'Grey Moore', 'Nathan Woodhull']
   gem.executables = ['ec2_host']
   # dependencies defined in Gemfile
 end
