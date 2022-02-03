@@ -50,23 +50,25 @@ module Hashicorptools
   class CodeDeploy < Thor
     AWS_REGION_US_EAST_1 = 'us-east-1'
 
+    attr_reader :git
+
     desc 'deploy', 'deploy latest code to environment'
     option :environment, required: true
     option :branch
     option :aws_regions, type: :array
     option :commit
     def deploy
-      g = Git.open('..')
+      @git = Git.open('..')
 
       # We set defaults (depending on environment) for aws_regions if not passed in
       aws_regions = options[:aws_regions] || default_regions
 
       commit = if options[:commit].present?
-                 g.gcommit(options[:commit])
+                 git.gcommit(options[:commit])
                else
                  branch = options[:branch].nil? ? :main : options[:branch].to_sym
-                 g.checkout(branch)
-                 g.log.first
+                 git.checkout(branch)
+                 git.log.first
                end
 
       puts "Deploying to environment #{options[:environment]} - regions: #{aws_regions.join(', ')}
@@ -98,6 +100,11 @@ module Hashicorptools
         end
       end
 
+      # If deployment succeeded, tag the commit that was deployed for the environment
+      if all_succeeded
+        create_tag(options[:environment], commit)
+      end
+
       # Return a success or failure status code to be consumed by bash
       exit(all_succeeded)
     end
@@ -110,6 +117,15 @@ module Hashicorptools
 
     def default_regions
       [AWS_REGION_US_EAST_1]
+    end
+
+    def create_tag(environment, commit)
+      # Delete previous tag in the remote repository
+      git.push('origin', ":#{environment}")
+
+      # Create the tag (replacing if it already exists) and push to remote repository
+      git.add_tag(environment, commit.sha, {f: true})
+      git.push('origin', environment)
     end
   end
 end
